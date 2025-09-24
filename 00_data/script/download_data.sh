@@ -41,6 +41,8 @@ wget -P ../ -O ../GSM9122899.feature.matrix.h5 "https://www.ncbi.nlm.nih.gov/geo
 # node: Mesenteric lymph node	(mLN)
 wget -P ../ -O ../GSE160156.read_counts.csv.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE160156&format=file&file=GSE160156%5Fread%5Fcounts%5FDC%2Ecsv%2Egz"
 
+# ^^ THIS IS BULK DATA 
+
 ############################################ Data set 4. George Kollias ############################################
 # GEO study link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE255350
 
