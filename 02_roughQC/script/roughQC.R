@@ -13,7 +13,7 @@ source("02_roughQC/script/functions.R")
 # Load data
 seurat_obj_list <- readRDS("01_make_seurat_object/out/seurat_obj_list.rds")
 
-# Filtered 
+# Initialize filtered list
 seurat_obj_roughQC_list <- list()
 
 ############################################ Data set 1. Caspar Ohnmacht ############################################
