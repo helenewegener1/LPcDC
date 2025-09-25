@@ -58,9 +58,13 @@ seurat_merged <- FindNeighbors(seurat_merged, dims = 1:20)
 seurat_merged <- FindClusters(seurat_merged, resolution = 0.4)
 seurat_merged <- RunUMAP(seurat_merged, reduction = "pca", dims = 1:20)
 
+# Save merged object
+saveRDS(seurat_merged, "04_integration/out/seurat_merged.rds")
+
 # Visualize with UMAP stratified by dataset - pre integration 
 DimPlot(seurat_merged, reduction = "umap", group.by = "orig.ident") + 
-  labs(title = "UMAP - pre integration")
+  labs(title = "UMAP - pre integration") + 
+  theme(legend.text = element_text(size = 8))
 ggsave("04_integration/plot/UMAP_pre_integration_orig.ident.pdf")
 
 ########################## Integration using Harmony ###########################
@@ -79,7 +83,8 @@ seurat_integrated <- RunUMAP(seurat_integrated, reduction = "harmony", dims = 1:
 
 # Visualize with UMAP stratified by dataset - post harmony integration 
 DimPlot(seurat_integrated, reduction = "umap", group.by = "orig.ident") +
-  labs(title = "UMAP - post harmonny integration")
+  labs(title = "UMAP - post harmonny integration") + 
+  theme(legend.text = element_text(size = 8))
 ggsave("04_integration/plot/UMAP_post_harmony_integration_orig.ident.pdf")
 
 # Visualize with UMAP stratified by seurat clusters - post harmony integration 
@@ -91,14 +96,28 @@ for (res in res_list){
   # res <- 0.2
   
   seurat_integrated <- FindClusters(seurat_integrated, resolution = res)
-  DimPlot(seurat_integrated, reduction = "umap", group.by = "seurat_clusters", label = TRUE) +
+  DimPlot(seurat_integrated, reduction = "umap", group.by = glue("SCT_snn_res.{res}"), label = TRUE) +
     labs(title = "UMAP - post harmony integration",
-         subtitle = glue("res: {res}"))
+         subtitle = glue("SCT_snn_res.{res}"))
   
-  ggsave(glue("04_integration/plot/UMAP_post_harmony_integration_seurat_clusters_res_{res}.pdf"))
+  ggsave(glue("04_integration/plot/UMAP_post_harmony_integration_SCT_snn_res_{res}.pdf"))
   
 }
 
+# Feature plots: UMAP stratified by continuous variable 
+
+features <- c("nFeature_RNA", "percent.mt", "percent.ribo")
+
+lapply(features, function(x) {
+  
+  FeaturePlot(seurat_integrated, reduction = "umap", features = x)
+  ggsave(glue("04_integration/plot/UMAP_post_harmony_integration_{x}.pdf"))
+  
+})
+
+################### Export list of integrated Seurat objects ################### 
+
+saveRDS(seurat_integrated, "04_integration/out/seurat_integrated.rds")
 
 
 
