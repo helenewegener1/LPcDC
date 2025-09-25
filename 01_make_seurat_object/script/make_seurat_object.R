@@ -6,6 +6,7 @@ library(Seurat)
 library(dplyr)
 library(glue)
 library(stringr)
+library(tibble)
 
 # List data files for overview
 data_files <- list.files("00_data/")
@@ -28,7 +29,10 @@ counts <- ReadMtx(
 )
 
 # Create seurat object 
-seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name)
+# This sample has 2.1 million cells 
+# Many of the cells have a very low number of genes detected 
+# So we do a rough filtering here
+seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name, min.cells = 3, min.features = 200)
 
 rm(counts, sample_name)
 

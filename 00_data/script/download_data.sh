@@ -3,7 +3,7 @@
 # GEO study link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243483
 
 # Sample: GSM7789315 control SI-LP steady state
-# Illumina NextSeq 500
+# Illumina HiSeq 2500
 wget -P ../ -O ../GSM7789315.barcodes.tsv.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789315&format=file&file=GSM7789315%5FMUC29369%5Fbarcodes%2Etsv%2Egz"
 wget -P ../ -O ../GSM7789315.features.tsv.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789315&format=file&file=GSM7789315%5FMUC29369%5Ffeatures%2Etsv%2Egz"
 wget -P ../ -O ../GSM7789315.matrix.mtx.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789315&format=file&file=GSM7789315%5FMUC29369%5Fmatrix%2Emtx%2Egz"
