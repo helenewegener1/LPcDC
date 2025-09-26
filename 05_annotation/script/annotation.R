@@ -12,7 +12,7 @@ library(stringr)
 source("05_annotation/script/functions.R")
 
 # Load data
-seurat_integrated <- readRDS("04_integration/out/seurat_integrated.rds")
+seurat_integrated <- readRDS("04_integration/out/seurat_harmony_integrated.rds")
 
 # Cluster plot
 res <- 0.5
