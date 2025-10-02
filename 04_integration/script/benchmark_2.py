@@ -8,13 +8,18 @@ from scib_metrics.benchmark import Benchmarker, BioConservation, BatchCorrection
 
 
 # 1. Define input data
-path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_RNA.h5ad"
+# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_all.h5ad"
+path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4.h5ad"
+# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4_rna.h5ad"
+# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4_sct.h5ad"
 
 # 2. Load all datasets into a dictionary
 adata = sc.read(path)
 print(adata)
 
 print('----------------------------------')
+
+print(adata.obsm)
 
 # Renaming
 adata.obsm["Unintegrated"] = adata.obsm["X_pca"]
@@ -26,12 +31,16 @@ print('--------------step 4---------------')
 bm = Benchmarker(
     adata,
     batch_key="orig.ident",
-    label_key="cell_type",
+    label_key="seurat_clusters",
     bio_conservation_metrics=BioConservation(),
     batch_correction_metrics=BatchCorrection(),
-    embedding_obsm_keys=["X_integrated.cca", "X_integrated.harmony", "X_integrated.mnn", "Unintegrated"],
+    # embedding_obsm_keys=["X_SCT_integrated_harmony", "X_SCT_integrated_rpca", "X_SCT_integrated_mnn", "Unintegrated",
+    #                      "X_RNA_integrated_harmony", "X_RNA_integrated_rpca", "X_RNA_integrated_mnn", "X_RNA_integrated_cca"],
+    # embedding_obsm_keys=["X_HARMONY", "Unintegrated"],
+    embedding_obsm_keys=["X_SCT_harmony", "Unintegrated"],
     n_jobs=6,
 )
+
 bm.benchmark()
 
 
@@ -51,6 +60,6 @@ df.to_csv("/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out
 # Save the results plot
 # import matplotlib.pyplot as plt
 
-bm.plot_results_table(min_max_scale=True, save_dir="/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/plot/integration_benchmark_results_min_max_scale.png")
+# bm.plot_results_table(min_max_scale=True, save_dir="/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/plot/integration_benchmark_results_min_max_scale.png")
 
 bm.plot_results_table(min_max_scale=False, save_dir="/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/plot/integration_benchmark_results.png")

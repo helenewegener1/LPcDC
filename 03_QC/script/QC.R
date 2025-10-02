@@ -4,6 +4,7 @@ setwd("~/Documents/projects/project_cDC/LPcDC/")
 library(SeuratObject)
 library(Seurat)
 library(dplyr)
+library(stringr)
 library(glue)
 library(ggplot2)
 library(DropletUtils)
@@ -14,6 +15,17 @@ library(glmGamPoi)
 seurat_obj_list <- readRDS("01_make_seurat_object/out/seurat_obj_list.rds") # raw = prefiltering 
 seurat_obj_roughQC_list <- readRDS("02_roughQC/out/seurat_obj_roughQC_list.rds")
 
+# Clean up Sample GSM9122899
+seurat_obj_list$GSM9122899@assays$RNA$counts <- seurat_obj_list$GSM9122899@assays$RNA$`counts.Gene Expression`
+seurat_obj_list$GSM9122899@assays$RNA$`counts.Gene Expression` <- NULL
+seurat_obj_list$GSM9122899@assays$RNA$`counts.Antibody Capture` <- NULL
+Layers(seurat_obj_list$GSM9122899)
+
+seurat_obj_roughQC_list$GSM9122899@assays$RNA$counts <- seurat_obj_roughQC_list$GSM9122899@assays$RNA$`counts.Gene Expression`
+seurat_obj_roughQC_list$GSM9122899@assays$RNA$`counts.Gene Expression` <- NULL
+seurat_obj_roughQC_list$GSM9122899@assays$RNA$`counts.Antibody Capture` <- NULL
+Layers(seurat_obj_roughQC_list$GSM9122899)
+
 # Investigate need for removal of empty droplets 
 # https://bioconductor.org/packages/release/bioc/vignettes/DropletUtils/inst/doc/DropletUtils.html
 for (sample_name in names(seurat_obj_list)){
@@ -21,11 +33,7 @@ for (sample_name in names(seurat_obj_list)){
   seurat_obj_raw <- seurat_obj_list[[sample_name]]
   
   # Get count matrix
-  if ("counts" %in% names(seurat_obj_raw@assays$RNA@layers)){
-    count_mat <- seurat_obj_raw@assays$RNA@layers$counts
-  } else {
-    count_mat <- seurat_obj_raw@assays$RNA@layers$`counts.Gene Expression`
-  }
+  count_mat <- seurat_obj_raw@assays$RNA@layers$counts
   
   br.out <- barcodeRanks(count_mat)
   
@@ -46,11 +54,7 @@ for (sample_name in names(seurat_obj_list)){
   seurat_obj_roughQC <- seurat_obj_roughQC_list[[sample_name]]
   
   # Get count matrix
-  if ("counts" %in% names(seurat_obj_roughQC@assays$RNA@layers)){
-    count_mat <- seurat_obj_roughQC@assays$RNA@layers$counts
-  } else {
-    count_mat <- seurat_obj_roughQC@assays$RNA@layers$`counts.Gene Expression`
-  }
+  count_mat <- seurat_obj_roughQC@assays$RNA@layers$counts
   
   br.out <- barcodeRanks(count_mat)
   
@@ -81,11 +85,6 @@ for (sample_name in names(seurat_obj_roughQC_list)){
   
   # Define sample
   seurat_obj_roughQC <- seurat_obj_roughQC_list[[sample_name]]
-  
-  # Make counts layer in RNA assay if not already exisit 
-  if (!("counts" %in% names(seurat_obj_roughQC@assays$RNA@layers))){
-    seurat_obj_roughQC@assays$RNA$counts <- seurat_obj_roughQC@assays$RNA$`counts.Gene Expression`
-  }
   
   #Normalize and scale using SCTransform. Note to us: decide on vars.to.regress. 
   seurat_obj_roughQC <- SCTransform(seurat_obj_roughQC, assay = "RNA", layer = "counts", verbose = FALSE)
@@ -175,6 +174,7 @@ seurat_obj_finalQC_list$GSE255350 %>% ncol()
 ########################################## Export list of filtered Seurat objects ##########################################
 
 saveRDS(seurat_obj_finalQC_list, "03_QC/out/seurat_obj_finalQC_list.rds")
+
 
 
 

@@ -14,100 +14,129 @@ library(SeuratWrappers)
 # remotes::install_github('satijalab/azimuth', ref = 'master')
 library(Azimuth)
 
-# # Load data
-# seurat_obj_finalQC_list <- readRDS("03_QC/out/seurat_obj_finalQC_list.rds")
-# 
-# ############### SCTransform individual datasets after filtering ################
-# 
-# seurat_obj_list <- list()
-# 
-# for (sample_name in names(seurat_obj_finalQC_list)) {
-# 
-#   # Define seurat object of sample
-#   seurat_obj_finalQC <- seurat_obj_finalQC_list[[sample_name]]
-# 
-#   # SCTransform gives a warning because the SCTransform assay from doublets were removed is overwritten
-#   seurat_obj_tmp <- SCTransform(seurat_obj_finalQC, assay = "RNA", layer = "counts", verbose = FALSE)
-# 
-#   # Save in list
-#   seurat_obj_list[[sample_name]] <- seurat_obj_tmp
-# 
-#   # Clean up
-#   rm(seurat_obj_tmp)
-# 
-# }
-# 
-# ############################ RNA integration prep ############################
-# 
-# # Merge
-# seurat_merged <- merge(seurat_obj_list[[1]], y = seurat_obj_list[-1])
-# 
-# # Control all cells from each dataset are included
-# seurat_merged@meta.data$orig.ident %>% table(useNA = "always")
-# 
-# # Remove redundant layers
-# Layers(seurat_merged[["RNA"]])
-# 
-# seurat_merged[["RNA"]]$`counts.Gene Expression.GSM9122899` <- NULL
-# seurat_merged[["RNA"]]$`counts.Antibody Capture.GSM9122899` <- NULL
-# 
-# Layers(seurat_merged[["RNA"]])
-# 
-# # Seurat workflow on merged data
-# seurat_merged <- SCTransform(seurat_merged, assay = "RNA", layer = "counts", verbose = FALSE)
-# seurat_merged <- RunPCA(seurat_merged, assay = "SCT", verbose = FALSE) # HW: Yes - SCT assay for PCA
-# 
-# # ^^ Needs the part above to run harmony ^^
-# 
-# # This is just for plotting UMAP
-# ElbowPlot(seurat_merged)
-# seurat_merged <- FindNeighbors(seurat_merged, assay = "SCT",  dims = 1:30)
-# seurat_merged <- FindClusters(seurat_merged, resolution = 0.4)
-# seurat_merged <- RunUMAP(seurat_merged, assay = "SCT", reduction = "pca", dims = 1:30)
-# 
-# # Save merged object
+# Load data
+seurat_obj_list <- readRDS("03_QC/out/seurat_obj_finalQC_list.rds")
+
+############################ RNA integration prep ############################
+
+# Merge
+seurat_merged <- merge(seurat_obj_list[[1]], y = seurat_obj_list[-1])
+
+# Split SCT layer
+seurat_merged[["SCT"]] <- split(seurat_merged[["SCT"]], f = seurat_merged$orig.ident)
+
+Layers(seurat_merged[["SCT"]])
+
+# Control all cells from each dataset are included
+seurat_merged@meta.data$orig.ident %>% table(useNA = "always")
+
+# Remove redundant layers
+Layers(seurat_merged[["RNA"]])
+
+seurat_merged[["RNA"]]$`counts.Gene Expression.GSM9122899` <- NULL
+seurat_merged[["RNA"]]$`counts.Antibody Capture.GSM9122899` <- NULL
+
+Layers(seurat_merged[["RNA"]])
+
+# Seurat workflow on merged data
+seurat_merged <- SCTransform(seurat_merged, assay = "RNA", layer = "counts", verbose = FALSE, vst.flavor = "v2")
+seurat_merged <- RunPCA(seurat_merged, assay = "SCT", verbose = FALSE) # HW: Yes - SCT assay for PCA
+
+# Split SCT layer
+seurat_merged[["SCT"]] <- split(seurat_merged[["SCT"]], f = seurat_merged$orig.ident)
+Layers(seurat_merged[["SCT"]])
+
+# ^^ Needs the part above to run harmony ^^
+
+# This is just for plotting UMAP
+ElbowPlot(seurat_merged)
+seurat_merged <- FindNeighbors(seurat_merged, assay = "SCT",  dims = 1:20)
+seurat_merged <- FindClusters(seurat_merged, resolution = 0.4)
+seurat_merged <- RunUMAP(seurat_merged, assay = "SCT", reduction = "pca", dims = 1:20)
+
+# Save merged object
 # saveRDS(seurat_merged, "04_integration/out/seurat_merged_SCT.rds")
-seurat_merged <- readRDS("04_integration/out/seurat_merged_SCT.rds")
+# seurat_merged <- readRDS("04_integration/out/seurat_merged_SCT.rds")
 
 DefaultAssay(seurat_merged)
 
-# Visualize with UMAP stratified by dataset - pre integration 
-DimPlot(seurat_merged, reduction = "umap", group.by = "orig.ident") + 
-  labs(title = "UMAP - pre integration") + 
+# Visualize with UMAP stratified by dataset - pre integration
+DimPlot(seurat_merged, reduction = "umap", group.by = "orig.ident") +
+  labs(title = "UMAP - SCT - pre integration") +
   theme(legend.text = element_text(size = 8))
 
-ggsave("04_integration/plot/SCT/UMAP_SCT_pre_integration_orig.ident.pdf", 
-       width = 8, 
+ggsave("04_integration/plot/SCT/UMAP_SCT_pre_integration_orig.ident.pdf",
+       width = 8,
        height = 7)
 
 ############################# SCT integration prep #############################
 
 DefaultAssay(seurat_merged) <- "RNA"
-seurat_merged <- NormalizeData(seurat_merged)
-seurat_merged <- FindVariableFeatures(seurat_merged)
-seurat_merged <- ScaleData(seurat_merged)
-seurat_merged <- RunPCA(seurat_merged)
+seurat_merged <- NormalizeData(seurat_merged, assay = "RNA")
+seurat_merged <- FindVariableFeatures(seurat_merged, assay = "RNA")
+seurat_merged <- ScaleData(seurat_merged, assay = "RNA")
+seurat_merged <- RunPCA(seurat_merged, assay = "RNA")
+
+ElbowPlot(seurat_merged)
+seurat_merged <- FindNeighbors(seurat_merged, assay = "RNA",  dims = 1:20)
+seurat_merged <- FindClusters(seurat_merged, resolution = 0.4)
+seurat_merged <- RunUMAP(seurat_merged, assay = "RNA", reduction = "pca", dims = 1:20)
+
+DimPlot(seurat_merged, reduction = "umap", group.by = "orig.ident") +
+  labs(title = "UMAP - RNA - pre integration") +
+  theme(legend.text = element_text(size = 8))
+
+ggsave("04_integration/plot/RNA/UMAP_RNA_pre_integration_orig.ident.pdf",
+       width = 8,
+       height = 7)
+
 DefaultAssay(seurat_merged)
 
 ############################## Integration on SCT ##############################
+
+# SCT assay: Uses sctransform for variance stabilization, which better handles technical noise and sequencing depth differences
 
 # Initiate integrated seurat obejct
 seurat_integrated <- seurat_merged
 
 DefaultAssay(seurat_integrated) <- "SCT"
 
+Layers(seurat_integrated[["SCT"]])
+
+Reductions(seurat_integrated)
+
 # Integrate using harmony
 seurat_integrated <- IntegrateLayers(
   object = seurat_integrated, 
-  method = HarmonyIntegration,
+  method = HarmonyIntegration, 
   orig.reduction = "pca", 
-  new.reduction = "SCT_integrated.harmony",
-  assay = "SCT", 
+  new.reduction = "SCT_integrated.harmony", 
+  # normalization.method = "SCT",
+  assay = "SCT",
   verbose = FALSE
 )
 
-# Split SCT layers for FastMNN Integration
-seurat_integrated[["SCT"]] <- split(seurat_integrated[["SCT"]], f = seurat_integrated$orig.ident)
+# Does not work well for SCT layer
+# seurat_integrated <- IntegrateLayers(
+#   object = seurat_integrated,
+#   method = CCAIntegration,
+#   orig.reduction = "pca",
+#   new.reduction = "SCT_integrated.cca",
+#   # normalization.method = "SCT",
+#   assay = "SCT",
+#   verbose = TRUE
+# )
+
+options(future.globals.maxSize = 8000 * 1024^2)  # 8 GB
+seurat_integrated <- IntegrateLayers(
+  object = seurat_integrated,
+  method = RPCAIntegration,
+  orig.reduction = "pca",
+  new.reduction = "SCT_integrated.rpca",
+  # normalization.method = "SCT",
+  assay = "SCT",
+  verbose = FALSE
+)
 
 # Integrate using FastMNNIntegration
 seurat_integrated <- IntegrateLayers(
@@ -119,12 +148,22 @@ seurat_integrated <- IntegrateLayers(
   verbose = FALSE
 )
 
-# Merge back the SCT Layers
-seurat_integrated[["SCT"]] <- JoinLayers(seurat_integrated[["SCT"]])
+# # Merge back the SCT Layers
+# seurat_integrated[["SCT"]] <- JoinLayers(seurat_integrated[["SCT"]])
 
 ############################## Integration on RNA ##############################
 
 DefaultAssay(seurat_integrated) <- "RNA"
+
+Layers(seurat_integrated[["RNA"]])
+
+# seurat_integrated <- seurat_merged
+# 
+# DefaultAssay(seurat_integrated) <- "SCT"
+# 
+# Layers(seurat_integrated[["SCT"]])
+# 
+# Reductions(seurat_integrated)
 
 seurat_integrated <- IntegrateLayers(
   object = seurat_integrated, 
@@ -144,14 +183,15 @@ seurat_integrated <- IntegrateLayers(
   verbose = FALSE
 )
 
-# seurat_integrated <- IntegrateLayers(
-#   object = seurat_integrated,
-#   method = RPCAIntegration,
-#   orig.reduction = "pca",
-#   new.reduction = "integrated.rpca",
-#   assay = "RNA",
-#   verbose = FALSE
-# )
+options(future.globals.maxSize = 8000 * 1024^2)  # 8 GB
+seurat_integrated <- IntegrateLayers(
+  object = seurat_integrated,
+  method = RPCAIntegration,
+  orig.reduction = "pca",
+  new.reduction = "RNA_integrated.rpca",
+  assay = "RNA",
+  verbose = FALSE
+)
 
 seurat_integrated <- IntegrateLayers(
   object = seurat_integrated,
@@ -162,27 +202,58 @@ seurat_integrated <- IntegrateLayers(
   verbose = FALSE
 )
 
+############################ Integration using scVI #############################
+
+# library(reticulate)
+# # python_path <- "/Users/srz223/Documents/projects/project_cDC/scib-env/bin/python"
+# # use_python(python_path, required = TRUE)
+# conda_path <- "/opt/homebrew/Caskroom/mambaforge/base/envs/scvi-m4-env/bin/python"
+# use_condaenv(conda_path, required = TRUE)
+# 
+# py_run_string("
+# import torch
+# if torch.backends.mps.is_available():
+#   torch.set_default_device('mps')
+#   print('PyTorch default device set to MPS (GPU acceleration).')
+# else:
+#   print('MPS not available. Defaulting to CPU.')\n
+# ")
+# 
+# options(future.globals.maxSize = 8000 * 1024^2)  # 8 GB
+# 
+# DefaultAssay(seurat_merged) <- "SCT"
+# Layers(seurat_merged)
+# 
+# # seurat_merged[["SCT"]] <- split(seurat_merged[["SCT"]], f = seurat_merged$orig.ident)
+# Layers(seurat_merged[["SCT"]])
+# 
+# seurat_integrated_scvi <- IntegrateLayers(
+#   object = seurat_merged,
+#   method = scVIIntegration,
+#   new.reduction = "integrated.scvi",
+#   # conda_env = python_path,
+#   conda_env = conda_path,
+#   verbose = TRUE
+# )
+
 
 ################### Export list of integrated Seurat objects ################### 
 
-seurat_integrated@reductions %>% 
-
-# seurat_integrated[["SCT"]]
-
-# saveRDS(seurat_integrated, "04_integration/out/seurat_integrated_SCT.rds")
-# seurat_integrated <- readRDS("04_integration/out/seurat_integrated_SCT.rds")
-
-saveRDS(seurat_integrated, "04_integration/out/seurat_integrated_all.rds")
+Reductions(seurat_integrated)
 
 ####################### Run UMAP using Harmony embedding #######################
 
 reductions <- list(
+  
   c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters"),
   c("RNA_integrated.harmony", "RNA_umap.harmony", "RNA_harmony_clusters"),
   c("RNA_integrated.mnn", "RNA_umap.mnn", "RNA_mnn_clusters"),
+  c("RNA_integrated.rpca", "RNA_umap.rpca", "RNA_rpca_clusters"),
   
   c("SCT_integrated.harmony", "SCT_umap.harmony", "SCT_harmony_clusters"),
-  c("SCT_integrated.mnn", "SCT_umap.mnn", "SCT_mnn_clusters") 
+  c("SCT_integrated.mnn", "SCT_umap.mnn", "SCT_mnn_clusters"),
+  c("SCT_integrated.rpca", "SCT_umap.rpca", "SCT_rpca_clusters")
+  
 )
 
 for (red in reductions){
@@ -197,25 +268,25 @@ for (red in reductions){
   # Set default assay 
   DefaultAssay(seurat_integrated) <- assay
   
-  seurat_integrated <- FindNeighbors(seurat_integrated, reduction = reduction, dims = 1:30)
+  seurat_integrated <- FindNeighbors(seurat_integrated, reduction = reduction, dims = 1:20)
   seurat_integrated <- FindClusters(seurat_integrated, resolution = 2, cluster.name = cluster.name)
   seurat_integrated <- RunUMAP(seurat_integrated, reduction = reduction, dims = 1:20, reduction.name = umap_reduction.name)
   seurat_integrated <- FindNeighbors(seurat_integrated, reduction = reduction, dims = 1:20)
   
   # Visualize with UMAP stratified by dataset - post harmony integration 
   DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = "orig.ident") +
-    labs(title = glue("UMAP - {assay} - post {reduction} integration")) + 
+    labs(title = glue("UMAP - post {reduction}")) + 
     theme(legend.text = element_text(size = 8))
   
-  ggsave(glue("04_integration/plot/{assay}/UMAP_{assay}_post_{reduction}_integration_orig.ident.pdf"), 
+  ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_orig.ident.pdf"), 
          width = 8, 
          height = 7)
   
   DimPlot(seurat_integrated, reduction = umap_reduction.name, split.by = "orig.ident", ncol = 3) +
-    labs(title = glue("UMAP - post {assay} {reduction} integration")) + 
+    labs(title = glue("UMAP - post {reduction}")) + 
     theme(legend.text = element_text(size = 8))
   
-  ggsave(glue("04_integration/plot/{assay}/UMAP_{assay}_post_{reduction}_integration_orig.ident_split.pdf"), 
+  ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_orig.ident_split.pdf"), 
          width = 12, 
          height = 8)
   
@@ -230,18 +301,18 @@ for (red in reductions){
     seurat_integrated <- FindClusters(seurat_integrated, resolution = res)
     
     DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{assay}_snn_res.{res}"), label = TRUE) +
-      labs(title = glue("UMAP - post {assay} {reduction} integration"),
+      labs(title = glue("UMAP - post {reduction}"),
            subtitle = glue("{assay}_snn_res.{res}"))
     
-    ggsave(glue(glue("04_integration/plot/{assay}/UMAP_{assay}_post_{reduction}_integration_{assay}_snn_res_{res}.pdf")), 
+    ggsave(glue(glue("04_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}.pdf")), 
            width = 8, 
            height = 7)
     
     DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{assay}_snn_res.{res}"), split.by = "orig.ident", ncol = 3) +
-      labs(title = glue("UMAP - post {assay} {reduction} integration"),
+      labs(title = glue("UMAP - post {reduction}"),
            subtitle = glue("{assay}_snn_res.{res}"))
     
-    ggsave(glue("04_integration/plot/{assay}/UMAP_{assay}_post_{reduction}_integration_{assay}_snn_res_{res}_split.by_orig.ident.pdf"), 
+    ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}_split.by_orig.ident.pdf"), 
            width = 12, 
            height = 8)
     
@@ -255,7 +326,7 @@ for (red in reductions){
   lapply(features, function(x) {
     
     FeaturePlot(seurat_integrated, reduction = umap_reduction.name, features = x)
-    ggsave(glue("04_integration/plot/{assay}/UMAP_{assay}_post_{reduction}_integration_{x}.pdf"), 
+    ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_{x}.pdf"), 
            width = 8, 
            height = 7)
     
@@ -263,6 +334,13 @@ for (red in reductions){
   
   
 }
+
+######################### Save as h5ad file for python ######################### 
+
+Reductions(seurat_integrated)
+
+saveRDS(seurat_integrated, "04_integration/out/seurat_integrated_all.rds")
+seurat_integrated <- readRDS("04_integration/out/seurat_integrated_all.rds")
 
 
 ######################### Save as h5ad file for python ######################### 
@@ -272,6 +350,15 @@ library(rhdf5)
 
 # All in one file 
 obj_tmp <- seurat_integrated 
+
+DefaultAssay(obj_tmp)
+
+Layers(obj_tmp[["RNA"]])
+Layers(obj_tmp[["SCT"]])
+
+# IMPORTANT: Join layers before export (h5ad doesn't support split layers)
+obj_tmp[["RNA"]] <- JoinLayers(obj_tmp[["RNA"]])
+obj_tmp[["SCT"]] <- JoinLayers(obj_tmp[["SCT"]])
 
 obj_tmp[["RNA3"]] <- as(object = obj_tmp[["RNA"]], Class = "Assay")
 DefaultAssay(obj_tmp) <- "RNA3"
@@ -283,9 +370,57 @@ DefaultAssay(obj_tmp) <- "SCT3"
 obj_tmp[["SCT"]] <- NULL
 obj_tmp <- RenameAssays(object = obj_tmp, SCT3 = 'SCT')
 
-filename <- glue("04_integration/out/mydata_SCT.h5Seurat")
+# Check new names
+reductions <- Reductions(obj_tmp)[str_detect(Reductions(obj_tmp), "integrated")]
+
+# 1. Extract the embeddings
+embeddings <- lapply(reductions, function(x) Embeddings(obj_tmp, reduction = x))
+names(embeddings) <- reductions
+
+# 2. Add the clean matrix as a new reduction
+for(x in reductions) {
+  
+  new_name <- str_replace(x, "\\.", "_")
+  
+  new_key <- str_replace(x, "_integrated\\.", "") %>% 
+    str_to_upper() %>% 
+    paste0("_")
+  
+  obj_tmp[[new_name]] <- CreateDimReducObject(
+    embeddings = embeddings[[x]], 
+    key = new_key,
+    assay = DefaultAssay(obj_tmp),
+    global = TRUE
+  )
+  
+  # Remove the problematic reduction to keep things clean
+  obj_tmp[[x]] <- NULL
+  
+}
+
+# Handle PCA 
+obj_tmp[["PCA"]] <- CreateDimReducObject(
+  embeddings = Embeddings(obj_tmp, reduction = "pca"), 
+  key = "PCA_",
+  assay = DefaultAssay(obj_tmp),
+  global = TRUE
+)
+
+# Remove the problematic reduction to keep things clean
+obj_tmp[["pca"]] <- NULL
+
+umap_reductions <- Reductions(obj_tmp)[str_detect(Reductions(obj_tmp), "umap")]
+for (x in umap_reductions) {
+  obj_tmp[[x]] <- NULL
+}
+
+# Verify the new reduction name (optional)
+Reductions(obj_tmp)
+
+filename <- glue("04_integration/out/mydata_all.h5Seurat")
 SaveH5Seurat(obj_tmp, filename = filename, overwrite = TRUE)
 Convert(filename, dest = "h5ad", overwrite = TRUE, verbose = FALSE)
+
 
 
 
