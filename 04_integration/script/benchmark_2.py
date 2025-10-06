@@ -6,7 +6,6 @@ import numpy as np
 import scanpy as sc
 from scib_metrics.benchmark import Benchmarker, BioConservation, BatchCorrection
 
-
 # 1. Define input data
 # path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_all.h5ad"
 # path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4.h5ad"

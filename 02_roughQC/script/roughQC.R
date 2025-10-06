@@ -191,8 +191,95 @@ rm(seurat_obj, seurat_obj_filtered, n_cells_raw, n_cells_filtered)
 
 ############################################ Data set 5. Fiona Powrie ############################################
 
-# decide if we want to run cell ranger 
+sample_name <- "CRAM1"
+
+seurat_obj <- seurat_obj_list[[sample_name]]
+
+# Calculate QC metrics
+seurat_obj[["percent.mt"]] <- PercentageFeatureSet(seurat_obj, pattern = "^mt-")
+seurat_obj[["percent.ribo"]] <- PercentageFeatureSet(seurat_obj, pattern = "^Rps|^Rpl")
+
+# if large data set, subset cells for visualization purposes (it takes too long to plot all cells)
+n_cells_raw <- ncol(seurat_obj) # 224334
+
+# # Real raw n_cells: 224334
+# # subset to 5k cells
+# subset_cells <- sample(colnames(seurat_obj), 5000)
+# seurat_obj_subset <- seurat_obj[, subset_cells]
+
+# Plot QC metrics in violin plots
+plot_qc(seurat_obj = seurat_obj, 
+        sample_name = sample_name, 
+        n_cells = n_cells_raw, 
+        version = "pre_filtered", 
+        filtering = "")
+
+# # Filter cells based on QC plots
+# filtering_expr <- expr(nFeature_RNA < 2500 & nFeature_RNA > 400 & percent.mt < 2.5)
+# seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
+# 
+# n_cells_filtered <- ncol(seurat_obj_filtered) 
+# 
+# # Plot QC metrics in violin plots after filtering
+# plot_qc(seurat_obj = seurat_obj_filtered, 
+#         sample_name = sample_name, 
+#         n_cells = n_cells_filtered, 
+#         version = "filtered", 
+#         filtering = rlang::expr_text(filtering_expr))
+
+# Save filtered seurat object
+seurat_obj_roughQC_list[[sample_name]] <- seurat_obj
+
+# Clean up
+rm(seurat_obj, n_cells_raw)
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
+
+sample_name <- "CRAM2"
+
+seurat_obj <- seurat_obj_list[[sample_name]]
+
+# Calculate QC metrics
+seurat_obj[["percent.mt"]] <- PercentageFeatureSet(seurat_obj, pattern = "^mt-")
+seurat_obj[["percent.ribo"]] <- PercentageFeatureSet(seurat_obj, pattern = "^Rps|^Rpl")
+
+# if large data set, subset cells for visualization purposes (it takes too long to plot all cells)
+n_cells_raw <- ncol(seurat_obj) # 281591
+
+# Real raw n_cells: 281591
+# subset to 5k cells
+# subset_cells <- sample(colnames(seurat_obj), 5000)
+# seurat_obj_subset <- seurat_obj[, subset_cells]
+
+# Plot QC metrics in violin plots
+plot_qc(seurat_obj = seurat_obj, 
+        sample_name = sample_name, 
+        n_cells = n_cells_raw, 
+        version = "pre_filtered", 
+        filtering = "")
+
+# # Filter cells based on QC plots
+# filtering_expr <- expr(nFeature_RNA < 2500 & nFeature_RNA > 400 & percent.mt < 2.5)
+# seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
+# 
+# n_cells_filtered <- ncol(seurat_obj_filtered) 
+# 
+# # Plot QC metrics in violin plots after filtering
+# plot_qc(seurat_obj = seurat_obj_filtered, 
+#         sample_name = sample_name, 
+#         n_cells = n_cells_filtered, 
+#         version = "filtered", 
+#         filtering = rlang::expr_text(filtering_expr))
+
+# Save filtered seurat object
+seurat_obj_roughQC_list[[sample_name]] <- seurat_obj
+
+# Clean up
+rm(seurat_obj, n_cells_raw)
+
 
 ########################################## Export list of filtered Seurat objects ##########################################
+
+names(seurat_obj_roughQC_list)
 
 saveRDS(seurat_obj_roughQC_list, "02_roughQC/out/seurat_obj_roughQC_list.rds")

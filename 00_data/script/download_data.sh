@@ -79,7 +79,6 @@ wget -P ../ -O ../GSE255350_metadata.txt.gz "https://www.ncbi.nlm.nih.gov/geo/do
 # wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR125/062/ERR12552062/ERR12552062_2.fastq.gz
 
 # Analyzed on computerome 
-rsync -avzP helweg@transfer.computerome.dk:/home/projects/dtu_00062/people/helweg/LPcDC_cellranger/cellranger_analysis/outputs/LP_CRAM1/outs/raw_feature_bc_matrix ../CRAM1_raw_feature_bc_matrix
-rsync -avzP helweg@transfer.computerome.dk:/home/projects/dtu_00062/people/helweg/LPcDC_cellranger/cellranger_analysis/outputs/LP_CRAM2/outs/raw_feature_bc_matrix ../CRAM2_raw_feature_bc_matrix
-
+rsync -avzP helweg@transfer.computerome.dk:/home/projects/dtu_00062/people/helweg/LPcDC_cellranger/cellranger_analysis/outputs/LP_CRAM1/outs/raw_feature_bc_matrix ../CRAM1
+rsync -avzP helweg@transfer.computerome.dk:/home/projects/dtu_00062/people/helweg/LPcDC_cellranger/cellranger_analysis/outputs/LP_CRAM2/outs/raw_feature_bc_matrix ../CRAM2
 

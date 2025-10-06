@@ -170,6 +170,12 @@ seurat_obj_finalQC_list$GSM9122899 %>% ncol()
 seurat_obj_roughQC_list$GSE255350 %>% ncol()
 seurat_obj_finalQC_list$GSE255350 %>% ncol()
 
+seurat_obj_roughQC_list$CRAM1 %>% ncol()
+seurat_obj_finalQC_list$CRAM1 %>% ncol()
+
+seurat_obj_roughQC_list$CRAM2 %>% ncol()
+seurat_obj_finalQC_list$CRAM2 %>% ncol()
+
 
 ########################################## Export list of filtered Seurat objects ##########################################
 

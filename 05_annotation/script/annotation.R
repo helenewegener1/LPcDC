@@ -11,8 +11,8 @@ library(stringr)
 
 source("05_annotation/script/functions.R")
 
-assay <- "SCT"
-# assay <- "RNA"
+# assay <- "SCT"
+assay <- "RNA"
 
 # Load data
 seurat_integrated <- readRDS(glue("04_integration/out/seurat_integrated_v5_{assay}.rds"))
@@ -23,17 +23,18 @@ Reductions(seurat_integrated)
 
 red_list <- list(
   
-  # red <- c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters"),
-  # red <- c("RNA_integrated.harmony", "RNA_umap.harmony", "RNA_harmony_clusters"),
-  # red <- c("RNA_integrated.mnn", "RNA_umap.mnn", "RNA_mnn_clusters"),
-  # red <- c("RNA_integrated.rpca", "RNA_umap.rpca", "RNA_rpca_clusters")
+  c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters"),
+  c("RNA_integrated.harmony", "RNA_umap.harmony", "RNA_harmony_clusters"),
+  c("RNA_integrated.mnn", "RNA_umap.mnn", "RNA_mnn_clusters"),
+  c("RNA_integrated.rpca", "RNA_umap.rpca", "RNA_rpca_clusters")
 
-  red <- c("SCT_integrated.cca", "SCT_umap.cca", "SCT_cca_clusters"),
-  red <- c("SCT_integrated.harmony", "SCT_umap.harmony", "SCT_harmony_clusters"),
-  red <- c("SCT_integrated.rpca", "SCT_umap.rpca", "SCT_rpca_clusters")
-  
+  # c("SCT_integrated.cca", "SCT_umap.cca", "SCT_cca_clusters"),
+  # c("SCT_integrated.harmony", "SCT_umap.harmony", "SCT_harmony_clusters"),
+  # c("SCT_integrated.rpca", "SCT_umap.rpca", "SCT_rpca_clusters")
+  # 
 )
 
+# red <- c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters")
 
 for (red in red_list){
   
@@ -42,10 +43,10 @@ for (red in red_list){
   cluster.name <- red[[3]]
   
   # Cluster plot
-  res <- 0.3
-  dp <- DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{assay}_snn_res.{res}"), label = TRUE) +
+  res <- 0.4
+  dp <- DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{cluster.name}_res.{res}"), label = TRUE) +
     labs(title = glue("UMAP - {reduction}"),
-         subtitle = glue("{assay}_snn_res.{res}"))
+         subtitle = glue("{cluster.name}_res.{res}"))
   
   ########################### CD45+ -> All immune cells ########################## 
   grep("CD45", rownames(seurat_integrated), value = TRUE, ignore.case = TRUE) # Can't find

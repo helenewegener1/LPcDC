@@ -13,6 +13,7 @@ library(harmony)
 library(SeuratWrappers)
 # remotes::install_github('satijalab/azimuth', ref = 'master')
 library(Azimuth)
+library(clustree)
 
 # Load data
 seurat_obj_list <- readRDS("03_QC/out/seurat_obj_finalQC_list.rds")
@@ -123,6 +124,8 @@ reductions <- list(
   
 )
 
+# red <- c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters")
+
 for (red in reductions){
   
   reduction <- red[[1]]
@@ -159,25 +162,26 @@ for (red in reductions){
   
   # Visualize with UMAP stratified by seurat clusters - post harmony integration 
   
-  res_list <- c(0.1, 0.3, 0.5)
+  res_list <- c(0.05, 0.1, 0.2, 0.3, 0.4, 0.5)
   
   for (res in res_list){
     
     # res <- 0.3
     
-    seurat_integrated <- FindClusters(seurat_integrated, resolution = res)
+    seurat_integrated <- FindClusters(seurat_integrated, resolution = res, cluster.name = glue("{cluster.name}_res.{res}"))
     
-    DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{assay}_snn_res.{res}"), label = TRUE) +
+    # WHAT TO NAME THEM?
+    DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{cluster.name}_res.{res}"), label = TRUE) +
       labs(title = glue("UMAP - post {reduction}"),
-           subtitle = glue("{assay}_snn_res.{res}"))
+           subtitle = glue("{cluster.name}_res.{res}"))
     
     ggsave(glue(glue("04_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}.pdf")), 
            width = 8, 
            height = 7)
     
-    DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{assay}_snn_res.{res}"), split.by = "orig.ident", ncol = 3) +
+    DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = glue("{cluster.name}_res.{res}"), split.by = "orig.ident", ncol = 3) +
       labs(title = glue("UMAP - post {reduction}"),
-           subtitle = glue("{assay}_snn_res.{res}"))
+           subtitle = glue("{cluster.name}_res.{res}"))
     
     ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}_split.by_orig.ident.pdf"), 
            width = 12, 
@@ -185,6 +189,8 @@ for (red in reductions){
     
     
   }
+
+  
   
   # Feature plots: UMAP stratified by continuous variable 
   
@@ -202,13 +208,34 @@ for (red in reductions){
   
 }
 
+# clustree
+
+cluster.name <- "RNA_cca_clusters"
+pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+dev.off()
+
+cluster.name <- "RNA_harmony_clusters"
+pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+dev.off()
+
+cluster.name <- "RNA_rpca_clusters"
+pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+dev.off()
+
+cluster.name <- "RNA_mnn_clusters"
+pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+dev.off()
+
 ######################### Save as h5ad file for python ######################### 
 
 Reductions(seurat_integrated)
 
-# saveRDS(seurat_integrated, "04_integration/out/seurat_integrated_v5_RNA.rds")
-seurat_integrated <- readRDS("04_integration/out/seurat_integrated_v5_RNA.rds")
-
+saveRDS(seurat_integrated, "04_integration/out/seurat_integrated_v5_RNA.rds")
+# seurat_integrated <- readRDS("04_integration/out/seurat_integrated_v5_RNA.rds")
 
 ######################## Save as h5ad file for python #########################
 
