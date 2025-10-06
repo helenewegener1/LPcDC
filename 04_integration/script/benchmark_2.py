@@ -9,9 +9,9 @@ from scib_metrics.benchmark import Benchmarker, BioConservation, BatchCorrection
 
 # 1. Define input data
 # path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_all.h5ad"
-path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4.h5ad"
-# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4_rna.h5ad"
-# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4_sct.h5ad"
+# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4.h5ad"
+# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_RNA_v5.h5ad"
+path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_SCT_v5.h5ad"
 
 # 2. Load all datasets into a dictionary
 adata = sc.read(path)
@@ -22,7 +22,7 @@ print('----------------------------------')
 print(adata.obsm)
 
 # Renaming
-adata.obsm["Unintegrated"] = adata.obsm["X_pca"]
+adata.obsm["Unintegrated"] = adata.obsm["X_PCA"]
 print(adata)
 
 print('--------------step 4---------------')
@@ -34,10 +34,8 @@ bm = Benchmarker(
     label_key="seurat_clusters",
     bio_conservation_metrics=BioConservation(),
     batch_correction_metrics=BatchCorrection(),
-    # embedding_obsm_keys=["X_SCT_integrated_harmony", "X_SCT_integrated_rpca", "X_SCT_integrated_mnn", "Unintegrated",
-    #                      "X_RNA_integrated_harmony", "X_RNA_integrated_rpca", "X_RNA_integrated_mnn", "X_RNA_integrated_cca"],
-    # embedding_obsm_keys=["X_HARMONY", "Unintegrated"],
-    embedding_obsm_keys=["X_SCT_harmony", "Unintegrated"],
+    # embedding_obsm_keys=["Unintegrated", "X_RNA_integrated_cca", "X_RNA_integrated_harmony", "X_RNA_integrated_mnn", "X_RNA_integrated_rpca"],
+    embedding_obsm_keys=["X_SCT_integrated_harmony", "X_SCT_integrated_cca", "X_SCT_integrated_rpca", "Unintegrated"],
     n_jobs=6,
 )
 
@@ -49,9 +47,9 @@ print('----------------------------------')
 
 
 # Collect and save results
-df = bm.get_results(min_max_scale=True)
-print(df)
-df.to_csv("/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/integration_benchmark_results_min_max_scale.csv")
+# df = bm.get_results(min_max_scale=True)
+# print(df)
+# df.to_csv("/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/integration_benchmark_results_min_max_scale.csv")
 
 df = bm.get_results(min_max_scale=False)
 print(df)

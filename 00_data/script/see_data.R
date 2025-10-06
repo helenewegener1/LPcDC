@@ -7,4 +7,4 @@ assayNames(adata)
 
 
 x <- assay(adata, "X")
-all(x == round(x)) # check if counts 
+all(x == round(x)) # check if counts - they are not
