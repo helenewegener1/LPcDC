@@ -41,8 +41,18 @@ subset_seurat <- FindNeighbors(subset_seurat, dims = 1:20)
 subset_seurat <- FindClusters(subset_seurat, resolution = 0.2)
 
 subset_seurat <- RunUMAP(subset_seurat, dims = 1:15)
-DimPlot(subset_seurat, reduction = "umap", label = TRUE)	
+
+target_cluster_name <- paste0(target_cluster, collapse = ", ")
+
+DimPlot(subset_seurat, reduction = "umap", label = TRUE) +
+  labs(title = glue("UMAP - subcluster of {target_cluster_name}"))
 
 # Find markers 
+markers_5_vs_all <- FindMarkers(subset_seurat, 
+                                ident.1 = 5)
+
+head(markers_5_vs_all, n = 100)
+
+# Find all markers 
 subset_markers <- FindAllMarkers(subset_seurat, only.pos = TRUE)
 
