@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# mamba activate scvi-m4-env
+
 # https://scib-metrics.readthedocs.io/en/stable/notebooks/lung_example.html
 
 import numpy as np
@@ -9,8 +11,8 @@ from scib_metrics.benchmark import Benchmarker, BioConservation, BatchCorrection
 # 1. Define input data
 # path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_all.h5ad"
 # path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_v4.h5ad"
-# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_RNA_v5.h5ad"
-path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_SCT_v5.h5ad"
+path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_RNA_v5.h5ad"
+# path = "/Users/srz223/Documents/projects/project_cDC/LPcDC/04_integration/out/mydata_SCT_v5.h5ad"
 
 # 2. Load all datasets into a dictionary
 adata = sc.read(path)
@@ -33,8 +35,8 @@ bm = Benchmarker(
     label_key="seurat_clusters",
     bio_conservation_metrics=BioConservation(),
     batch_correction_metrics=BatchCorrection(),
-    # embedding_obsm_keys=["Unintegrated", "X_RNA_integrated_cca", "X_RNA_integrated_harmony", "X_RNA_integrated_mnn", "X_RNA_integrated_rpca"],
-    embedding_obsm_keys=["X_SCT_integrated_harmony", "X_SCT_integrated_cca", "X_SCT_integrated_rpca", "Unintegrated"],
+    embedding_obsm_keys=["Unintegrated", "X_RNA_integrated_cca", "X_RNA_integrated_harmony", "X_RNA_integrated_mnn", "X_RNA_integrated_rpca"],
+    # embedding_obsm_keys=["X_SCT_integrated_harmony", "X_SCT_integrated_cca", "X_SCT_integrated_rpca", "Unintegrated"],
     n_jobs=6,
 )
 

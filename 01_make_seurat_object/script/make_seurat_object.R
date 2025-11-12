@@ -159,48 +159,61 @@ seurat_obj_list[[sample_name]] <- AddMetaData(seurat_obj_list[[sample_name]], me
 seurat_obj_list[[sample_name]]@meta.data %>% head()
 
 ############################################ Data set 5. Fiona Powrie ############################################
+# # 2025-10-15, email from Faidra: "The Fiona Powrie dataset will have to wait a bit since we might not be able to use it".
+# # Myeloid. Contain multiple site such as Lamina Propria, MLN and others. 
+# # Two conditions: Helicobacter infection = Inflammation, and WT
+# 
+# sample_name <- "CRAM1"
+# 
+# # Read data
+# # counts <- ReadMtx(
+# #   mtx = glue("00_data/{sample_name}/raw_feature_bc_matrix/matrix.mtx.gz"),
+# #   features = glue("00_data/{sample_name}/raw_feature_bc_matrix/features.tsv.gz"),
+# #   cells = glue("00_data/{sample_name}/raw_feature_bc_matrix/barcodes.tsv.gz")
+# # )
+# counts <- ReadMtx(
+#   mtx = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/matrix.mtx.gz"),
+#   features = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/features.tsv.gz"),
+#   cells = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/barcodes.tsv.gz")
+# )
+# 
+# seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name, min.cells = 3, min.features = 200)
+# 
+# # Create seurat object 
+# seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name)
+# rm(counts, sample_name)
+# 
+# sample_name <- "CRAM2"
+# 
+# # Read data
+# # counts <- ReadMtx(
+# #   mtx = glue("00_data/{sample_name}/raw_feature_bc_matrix/matrix.mtx.gz"),
+# #   features = glue("00_data/{sample_name}/raw_feature_bc_matrix/features.tsv.gz"),
+# #   cells = glue("00_data/{sample_name}/raw_feature_bc_matrix/barcodes.tsv.gz")
+# # )
+# counts <- ReadMtx(
+#   mtx = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/matrix.mtx.gz"),
+#   features = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/features.tsv.gz"),
+#   cells = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/barcodes.tsv.gz")
+# )
+# 
+# seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name, min.cells = 3, min.features = 200)
+# 
+# # Create seurat object 
+# seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name)
+# rm(counts, sample_name)
 
-# Myeloid. Contain multiple site such as Lamina Propria, MLN and others. 
-# Two conditions: Helicobacter infection = Inflammation, and WT
+############################################ Data set 6. Rivera CA ############################################
 
-sample_name <- "CRAM1"
+# Sample: GSM5678427 CD103+CD11b+ dendritic cells from lamina propria
+
+sample_name <- "GSM5678427"
 
 # Read data
-# counts <- ReadMtx(
-#   mtx = glue("00_data/{sample_name}/raw_feature_bc_matrix/matrix.mtx.gz"),
-#   features = glue("00_data/{sample_name}/raw_feature_bc_matrix/features.tsv.gz"),
-#   cells = glue("00_data/{sample_name}/raw_feature_bc_matrix/barcodes.tsv.gz")
-# )
-counts <- ReadMtx(
-  mtx = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/matrix.mtx.gz"),
-  features = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/features.tsv.gz"),
-  cells = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/barcodes.tsv.gz")
-)
-
-seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name, min.cells = 3, min.features = 200)
+counts <- Read10X_h5(glue("00_data/{sample_name}_LP_raw_gene_bc_matrices_h5.h5"))
 
 # Create seurat object 
-seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name)
-rm(counts, sample_name)
-
-sample_name <- "CRAM2"
-
-# Read data
-# counts <- ReadMtx(
-#   mtx = glue("00_data/{sample_name}/raw_feature_bc_matrix/matrix.mtx.gz"),
-#   features = glue("00_data/{sample_name}/raw_feature_bc_matrix/features.tsv.gz"),
-#   cells = glue("00_data/{sample_name}/raw_feature_bc_matrix/barcodes.tsv.gz")
-# )
-counts <- ReadMtx(
-  mtx = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/matrix.mtx.gz"),
-  features = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/features.tsv.gz"),
-  cells = glue("00_data/{sample_name}_filtered/filtered_feature_bc_matrix/barcodes.tsv.gz")
-)
-
 seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name, min.cells = 3, min.features = 200)
-
-# Create seurat object 
-seurat_obj_list[[sample_name]] <- CreateSeuratObject(counts = counts, project = sample_name)
 rm(counts, sample_name)
 
 ########################################## Export list of Seurat objects ##########################################

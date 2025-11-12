@@ -1,4 +1,6 @@
-setwd("~/Documents/projects/project_cDC/LPcDC/")
+# setwd("~/Documents/projects/project_cDC/LPcDC/")
+
+getwd()
 
 # Load libraries 
 library(SeuratObject)
@@ -16,14 +18,29 @@ library(Azimuth)
 library(clustree)
 
 # Load data
-seurat_obj_list <- readRDS("03_QC_filtering/out/seurat_obj_QC_filtered_list.rds")
+seurat_obj <- readRDS("13_inflammation_QC/out/seurat_obj_finalQC.rds")
+
+############################ Check batch effect ############################
+
+DimPlot(seurat_obj, reduction = "umap", group.by = "annotation", split.by = "sample") + 
+  labs(title = "UMAP - RNA - pre integration") +
+  theme(legend.text = element_text(size = 8))
+
+ggsave("14_inflammation_integration/plot/UMAP_RNA_pre_integration_annotation.pdf", width = 12, height = 7)
+
+DimPlot(seurat_obj, reduction = "umap", group.by = "sample") + 
+  labs(title = "UMAP - RNA - pre integration") +
+  theme(legend.text = element_text(size = 8))
+
+ggsave("14_inflammation_integration/plot/UMAP_RNA_pre_integration_sample.pdf", width = 12, height = 7)
 
 ############################ RNA integration prep ############################
 
-# Merge
-seurat_merged <- merge(seurat_obj_list[[1]], y = seurat_obj_list[-1])
+seurat_obj[["RNA"]] <- split(seurat_obj[["RNA"]], f = seurat_obj$sample)
 
-Layers(seurat_merged[["RNA"]]) # already split
+Layers(seurat_obj[["RNA"]]) # already split
+
+seurat_merged <- seurat_obj
 
 DefaultAssay(seurat_merged) <- "RNA"
 
@@ -39,19 +56,8 @@ seurat_merged <- FindClusters(seurat_merged, resolution = 0.4)
 seurat_merged <- RunUMAP(seurat_merged, reduction = "pca", dims = 1:30)
 
 # Save merged object
-# saveRDS(seurat_merged, "04_integration/out/seurat_merged_SCT.rds")
-# seurat_merged <- readRDS("04_integration/out/seurat_merged_SCT.rds")
-
-DefaultAssay(seurat_merged)
-
-# Visualize with UMAP stratified by dataset - pre integration
-DimPlot(seurat_merged, reduction = "umap", group.by = "orig.ident") +
-  labs(title = "UMAP - RNA - pre integration") +
-  theme(legend.text = element_text(size = 8))
-
-ggsave("04_integration/plot/RNA/UMAP_RNA_pre_integration_orig.ident.pdf",
-       width = 8,
-       height = 7)
+# saveRDS(seurat_merged, "14_inflammation_integration/out/seurat_merged_SCT.rds")
+# seurat_merged <- readRDS("14_inflammation_integration/out/seurat_merged_SCT.rds")
 
 DefaultAssay(seurat_merged)
 
@@ -117,10 +123,10 @@ Reductions(seurat_integrated)
 
 reductions <- list(
   
-  c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters")
-  # c("RNA_integrated.harmony", "RNA_umap.harmony", "RNA_harmony_clusters"),
-  # c("RNA_integrated.mnn", "RNA_umap.mnn", "RNA_mnn_clusters"),
-  # c("RNA_integrated.rpca", "RNA_umap.rpca", "RNA_rpca_clusters")
+  c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters"),
+  c("RNA_integrated.harmony", "RNA_umap.harmony", "RNA_harmony_clusters"),
+  c("RNA_integrated.mnn", "RNA_umap.mnn", "RNA_mnn_clusters"),
+  c("RNA_integrated.rpca", "RNA_umap.rpca", "RNA_rpca_clusters")
   
 )
 
@@ -148,7 +154,7 @@ for (red in reductions){
     labs(title = glue("UMAP - post {reduction}")) + 
     theme(legend.text = element_text(size = 8))
   
-  ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_orig.ident.pdf"), 
+  ggsave(glue("14_inflammation_integration/plot/{assay}/UMAP_{reduction}_orig.ident.pdf"), 
          width = 8, 
          height = 7)
   
@@ -156,13 +162,13 @@ for (red in reductions){
     labs(title = glue("UMAP - post {reduction}")) + 
     theme(legend.text = element_text(size = 8))
   
-  ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_orig.ident_split.pdf"), 
+  ggsave(glue("14_inflammation_integration/plot/{assay}/UMAP_{reduction}_orig.ident_split.pdf"), 
          width = 12, 
          height = 8)
   
   # Visualize with UMAP stratified by seurat clusters - post harmony integration 
   
-  res_list <- seq(0.1, 1.5, by = 0.1)
+  res_list <- c(0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7)
   
   for (res in res_list){
     
@@ -175,7 +181,7 @@ for (red in reductions){
       labs(title = glue("UMAP - post {reduction}"),
            subtitle = glue("{cluster.name}_res.{res}"))
     
-    ggsave(glue(glue("04_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}.pdf")), 
+    ggsave(glue(glue("14_inflammation_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}.pdf")), 
            width = 8, 
            height = 7)
     
@@ -183,7 +189,7 @@ for (red in reductions){
       labs(title = glue("UMAP - post {reduction}"),
            subtitle = glue("{cluster.name}_res.{res}"))
     
-    ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}_split.by_orig.ident.pdf"), 
+    ggsave(glue("14_inflammation_integration/plot/{assay}/UMAP_{reduction}_{assay}_snn_res_{res}_split.by_orig.ident.pdf"), 
            width = 12, 
            height = 8)
     
@@ -199,7 +205,7 @@ for (red in reductions){
   # lapply(features, function(x) {
   #   
   #   FeaturePlot(seurat_integrated, reduction = umap_reduction.name, features = x)
-  #   ggsave(glue("04_integration/plot/{assay}/UMAP_{reduction}_{x}.pdf"), 
+  #   ggsave(glue("14_inflammation_integration/plot/{assay}/UMAP_{reduction}_{x}.pdf"), 
   #          width = 8, 
   #          height = 7)
   #   
@@ -211,31 +217,31 @@ for (red in reductions){
 # clustree
 
 cluster.name <- "RNA_cca_clusters"
-pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+pdf(file = glue("14_inflammation_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
 clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
 dev.off()
 
-# cluster.name <- "RNA_harmony_clusters"
-# pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
-# clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
-# dev.off()
-# 
-# cluster.name <- "RNA_rpca_clusters"
-# pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
-# clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
-# dev.off()
-# 
-# cluster.name <- "RNA_mnn_clusters"
-# pdf(file = glue("04_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
-# clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
-# dev.off()
+cluster.name <- "RNA_harmony_clusters"
+pdf(file = glue("14_inflammation_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+dev.off()
+
+cluster.name <- "RNA_rpca_clusters"
+pdf(file = glue("14_inflammation_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+dev.off()
+
+cluster.name <- "RNA_mnn_clusters"
+pdf(file = glue("14_inflammation_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 10)
+clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+dev.off()
 
 ######################### Save as h5ad file for python ######################### 
 
 Reductions(seurat_integrated)
 
-saveRDS(seurat_integrated, "04_integration/out/seurat_integrated_v5_RNA.rds")
-# seurat_integrated <- readRDS("04_integration/out/seurat_integrated_v5_RNA.rds")
+saveRDS(seurat_integrated, "14_inflammation_integration/out/seurat_integrated_v5_RNA.rds")
+# seurat_integrated <- readRDS("14_inflammation_integration/out/seurat_integrated_v5_RNA.rds")
 
 ######################## Save as h5ad file for python #########################
 
@@ -304,7 +310,7 @@ for (x in umap_reductions) {
 # Verify the new reduction name (optional)
 Reductions(obj_tmp)
 
-filename <- glue("04_integration/out/mydata_RNA_v5.h5Seurat")
+filename <- glue("14_inflammation_integration/out/mydata_RNA_v5.h5Seurat")
 SaveH5Seurat(obj_tmp, filename = filename, overwrite = TRUE)
 Convert(filename, dest = "h5ad", overwrite = TRUE, verbose = FALSE)
 

@@ -82,3 +82,31 @@ wget -P ../ -O ../GSE255350_metadata.txt.gz "https://www.ncbi.nlm.nih.gov/geo/do
 rsync -avzP helweg@transfer.computerome.dk:/home/projects/dtu_00062/people/helweg/LPcDC_cellranger/cellranger_analysis/outputs/LP_CRAM1/outs/raw_feature_bc_matrix ../CRAM1
 rsync -avzP helweg@transfer.computerome.dk:/home/projects/dtu_00062/people/helweg/LPcDC_cellranger/cellranger_analysis/outputs/LP_CRAM2/outs/raw_feature_bc_matrix ../CRAM2
 
+# 2025-10-15, email from Faidra: "The Fiona Powrie dataset will have to wait a bit since we might not be able to use it".
+
+############################################ Data set 6. Rivera CA ############################################
+
+# Study link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE188379 
+
+# GSM5678427 CD103+CD11b+ dendritic cells from lamina propria
+
+wget -P ../ -O ../GSM5678427_LP_raw_gene_bc_matrices_h5.h5 "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM5678427&format=file&file=GSM5678427%5FLP%5Fraw%5Fgene%5Fbc%5Fmatrices%5Fh5%2Eh5" 
+
+############################################ Colon data ############################################
+
+# I am also going to attach some data from colon that we should keep in case we want to do an object for colon in the future.
+# colon : https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE137927
+# GSM4094548	SPF_scRNAseq
+# GSM4094549	GF_scRNAseq
+
+
+############################################ Data set 7. ############################################
+# https://www.ebi.ac.uk/biostudies/ArrayExpress/studies/E-MTAB-9522?query=E-MTAB-9522
+wget -P ../ -O ../E_MTAB_9522_wt_S1_R1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R1.fastq.gz
+wget -P ../ -O ../E_MTAB_9522_wt_S1_R2.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R2.fastq.gz
+wget -P ../ -O ../E_MTAB_9522_wt_S1_I1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_I1.fastq.gz
+
+
+
+
+

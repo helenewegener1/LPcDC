@@ -15,7 +15,7 @@ library(SeuratWrappers)
 library(Azimuth)
 
 # Load data
-seurat_obj_list <- readRDS("03_QC/out/seurat_obj_finalQC_list.rds")
+seurat_obj_list <- readRDS("03_QC_filtering/out/seurat_obj_QC_filtered_list.rds")
 
 ############################ RNA integration prep ############################
 

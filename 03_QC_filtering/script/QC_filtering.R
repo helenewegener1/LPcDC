@@ -8,13 +8,13 @@ library(glue)
 library(ggplot2)
 library(patchwork)
 
-source("02_roughQC/script/functions.R")
+source("03_QC_filtering/script/functions.R")
 
 # Load data
-seurat_obj_list <- readRDS("01_make_seurat_object/out/seurat_obj_list.rds")
+seurat_obj_list <- readRDS("02_QC/out/seurat_obj_QC_metrics.rds")
 
 # Initialize filtered list
-seurat_obj_roughQC_list <- list()
+seurat_obj_QC_filtered_list <- list()
 
 ############################################ Data set 1. Caspar Ohnmacht ############################################
 
@@ -48,7 +48,7 @@ FeatureScatter(seurat_obj, feature1 = "nCount_RNA", feature2 = "percent.mt")
 FeatureScatter(seurat_obj, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 
 # Filter cells based on QC plots
-filtering_expr <- expr(nFeature_RNA > 1500 & nFeature_RNA < 6000 & percent.mt < 5)
+filtering_expr <- expr(nFeature_RNA > 1000 & nFeature_RNA < 6000 & percent.mt < 5)
 seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
 
 n_cells_filtered <- ncol(seurat_obj_filtered)
@@ -61,7 +61,7 @@ plot_qc(seurat_obj = seurat_obj_filtered,
         filtering = rlang::expr_text(filtering_expr))
 
 # Save filtered seurat object
-seurat_obj_roughQC_list[[sample_name]] <- seurat_obj_filtered
+seurat_obj_QC_filtered_list[[sample_name]] <- seurat_obj_filtered
 
 # Clean up
 rm(seurat_obj, seurat_obj_filtered, n_cells_raw, n_cells_filtered)
@@ -88,7 +88,7 @@ plot_qc(seurat_obj = seurat_obj,
         filtering = "")
 
 # Filter cells based on QC plots
-filtering_expr <- expr(nFeature_RNA < 6000 & nFeature_RNA > 1000 & percent.mt < 4)
+filtering_expr <- expr(nFeature_RNA < 6000 & nFeature_RNA > 400 & percent.mt < 4)
 seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
 
 n_cells_filtered <- ncol(seurat_obj_filtered) 
@@ -101,7 +101,7 @@ plot_qc(seurat_obj = seurat_obj_filtered,
         filtering = rlang::expr_text(filtering_expr))
 
 # Save filtered seurat object
-seurat_obj_roughQC_list[[sample_name]] <- seurat_obj_filtered
+seurat_obj_QC_filtered_list[[sample_name]] <- seurat_obj_filtered
 
 # Clean up
 rm(seurat_obj, seurat_obj_filtered, n_cells_raw, n_cells_filtered)
@@ -127,7 +127,7 @@ plot_qc(seurat_obj = seurat_obj,
         filtering = "")
 
 # Filter cells based on QC plots
-filtering_expr <- expr(nFeature_RNA < 6000 & nFeature_RNA > 1500 & percent.mt < 2.5)
+filtering_expr <- expr(nFeature_RNA < 6000 & nFeature_RNA > 400 & percent.mt < 2.5)
 seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
 
 n_cells_filtered <- ncol(seurat_obj_filtered) 
@@ -140,7 +140,7 @@ plot_qc(seurat_obj = seurat_obj_filtered,
         filtering = rlang::expr_text(filtering_expr))
 
 # Save filtered seurat object
-seurat_obj_roughQC_list[[sample_name]] <- seurat_obj_filtered
+seurat_obj_QC_filtered_list[[sample_name]] <- seurat_obj_filtered
 
 # Clean up
 rm(seurat_obj, seurat_obj_filtered, n_cells_raw, n_cells_filtered)
@@ -171,7 +171,7 @@ plot_qc(seurat_obj = seurat_obj,
         filtering = "")
 
 # Filter cells based on QC plots
-filtering_expr <- expr(nFeature_RNA < 5000 & nFeature_RNA > 2000 & percent.mt < 3.5)
+filtering_expr <- expr(nFeature_RNA < 6000 & nFeature_RNA > 2000 & percent.mt < 3.5)
 seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
 
 n_cells_filtered <- ncol(seurat_obj_filtered) 
@@ -184,102 +184,146 @@ plot_qc(seurat_obj = seurat_obj_filtered,
         filtering = rlang::expr_text(filtering_expr))
 
 # Save filtered seurat object
-seurat_obj_roughQC_list[[sample_name]] <- seurat_obj_filtered
+seurat_obj_QC_filtered_list[[sample_name]] <- seurat_obj_filtered
 
 # Clean up
 rm(seurat_obj, seurat_obj_filtered, n_cells_raw, n_cells_filtered)
 
 ############################################ Data set 5. Fiona Powrie ############################################
 
-sample_name <- "CRAM1"
-
-seurat_obj <- seurat_obj_list[[sample_name]]
-
-# Calculate QC metrics
-seurat_obj[["percent.mt"]] <- PercentageFeatureSet(seurat_obj, pattern = "^mt-")
-seurat_obj[["percent.ribo"]] <- PercentageFeatureSet(seurat_obj, pattern = "^Rps|^Rpl")
-
-# if large data set, subset cells for visualization purposes (it takes too long to plot all cells)
-n_cells_raw <- ncol(seurat_obj) # 224334
-
-# # Real raw n_cells: 224334
+# sample_name <- "CRAM1"
+# 
+# seurat_obj <- seurat_obj_list[[sample_name]]
+# 
+# # Calculate QC metrics
+# seurat_obj[["percent.mt"]] <- PercentageFeatureSet(seurat_obj, pattern = "^mt-")
+# seurat_obj[["percent.ribo"]] <- PercentageFeatureSet(seurat_obj, pattern = "^Rps|^Rpl")
+# 
+# # if large data set, subset cells for visualization purposes (it takes too long to plot all cells)
+# n_cells_raw <- ncol(seurat_obj) # 224334
+# 
+# # # Real raw n_cells: 224334
+# # # subset to 5k cells
+# # subset_cells <- sample(colnames(seurat_obj), 5000)
+# # seurat_obj_subset <- seurat_obj[, subset_cells]
+# 
+# # Plot QC metrics in violin plots
+# plot_qc(seurat_obj = seurat_obj, 
+#         sample_name = sample_name, 
+#         n_cells = n_cells_raw, 
+#         version = "pre_filtered", 
+#         filtering = "")
+# 
+# # # Filter cells based on QC plots
+# # filtering_expr <- expr(nFeature_RNA < 2500 & nFeature_RNA > 400 & percent.mt < 2.5)
+# # seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
+# # 
+# # n_cells_filtered <- ncol(seurat_obj_filtered) 
+# # 
+# # # Plot QC metrics in violin plots after filtering
+# # plot_qc(seurat_obj = seurat_obj_filtered, 
+# #         sample_name = sample_name, 
+# #         n_cells = n_cells_filtered, 
+# #         version = "filtered", 
+# #         filtering = rlang::expr_text(filtering_expr))
+# 
+# # Save filtered seurat object
+# seurat_obj_QC_filtered_list[[sample_name]] <- seurat_obj
+# 
+# # Clean up
+# rm(seurat_obj, n_cells_raw)
+# 
+# ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
+# 
+# sample_name <- "CRAM2"
+# 
+# seurat_obj <- seurat_obj_list[[sample_name]]
+# 
+# # Calculate QC metrics
+# seurat_obj[["percent.mt"]] <- PercentageFeatureSet(seurat_obj, pattern = "^mt-")
+# seurat_obj[["percent.ribo"]] <- PercentageFeatureSet(seurat_obj, pattern = "^Rps|^Rpl")
+# 
+# # if large data set, subset cells for visualization purposes (it takes too long to plot all cells)
+# n_cells_raw <- ncol(seurat_obj) # 281591
+# 
+# # Real raw n_cells: 281591
 # # subset to 5k cells
-# subset_cells <- sample(colnames(seurat_obj), 5000)
-# seurat_obj_subset <- seurat_obj[, subset_cells]
-
-# Plot QC metrics in violin plots
-plot_qc(seurat_obj = seurat_obj, 
-        sample_name = sample_name, 
-        n_cells = n_cells_raw, 
-        version = "pre_filtered", 
-        filtering = "")
-
-# # Filter cells based on QC plots
-# filtering_expr <- expr(nFeature_RNA < 2500 & nFeature_RNA > 400 & percent.mt < 2.5)
-# seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
+# # subset_cells <- sample(colnames(seurat_obj), 5000)
+# # seurat_obj_subset <- seurat_obj[, subset_cells]
 # 
-# n_cells_filtered <- ncol(seurat_obj_filtered) 
-# 
-# # Plot QC metrics in violin plots after filtering
-# plot_qc(seurat_obj = seurat_obj_filtered, 
+# # Plot QC metrics in violin plots
+# plot_qc(seurat_obj = seurat_obj, 
 #         sample_name = sample_name, 
-#         n_cells = n_cells_filtered, 
-#         version = "filtered", 
-#         filtering = rlang::expr_text(filtering_expr))
+#         n_cells = n_cells_raw, 
+#         version = "pre_filtered", 
+#         filtering = "")
+# 
+# # # Filter cells based on QC plots
+# # filtering_expr <- expr(nFeature_RNA < 2500 & nFeature_RNA > 400 & percent.mt < 2.5)
+# # seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
+# # 
+# # n_cells_filtered <- ncol(seurat_obj_filtered) 
+# # 
+# # # Plot QC metrics in violin plots after filtering
+# # plot_qc(seurat_obj = seurat_obj_filtered, 
+# #         sample_name = sample_name, 
+# #         n_cells = n_cells_filtered, 
+# #         version = "filtered", 
+# #         filtering = rlang::expr_text(filtering_expr))
+# 
+# # Save filtered seurat object
+# seurat_obj_QC_filtered_list[[sample_name]] <- seurat_obj
+# 
+# # Clean up
+# rm(seurat_obj, n_cells_raw)
 
-# Save filtered seurat object
-seurat_obj_roughQC_list[[sample_name]] <- seurat_obj
+############################################ Data set 6. Rivera CA ############################################
 
-# Clean up
-rm(seurat_obj, n_cells_raw)
-
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
-
-sample_name <- "CRAM2"
+# Sample: GSM5678427 CD103+CD11b+ dendritic cells from lamina propria
+sample_name <- "GSM5678427"
 
 seurat_obj <- seurat_obj_list[[sample_name]]
 
 # Calculate QC metrics
 seurat_obj[["percent.mt"]] <- PercentageFeatureSet(seurat_obj, pattern = "^mt-")
 seurat_obj[["percent.ribo"]] <- PercentageFeatureSet(seurat_obj, pattern = "^Rps|^Rpl")
+seurat_obj[["percent.hb"]] <- PercentageFeatureSet(seurat_obj, pattern = "^Hb[ab]")
 
 # if large data set, subset cells for visualization purposes (it takes too long to plot all cells)
-n_cells_raw <- ncol(seurat_obj) # 281591
-
-# Real raw n_cells: 281591
-# subset to 5k cells
-# subset_cells <- sample(colnames(seurat_obj), 5000)
-# seurat_obj_subset <- seurat_obj[, subset_cells]
+n_cells_raw <- ncol(seurat_obj) 
 
 # Plot QC metrics in violin plots
 plot_qc(seurat_obj = seurat_obj, 
         sample_name = sample_name, 
         n_cells = n_cells_raw, 
-        version = "pre_filtered", 
+        version = "raw", 
         filtering = "")
 
-# # Filter cells based on QC plots
-# filtering_expr <- expr(nFeature_RNA < 2500 & nFeature_RNA > 400 & percent.mt < 2.5)
-# seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
-# 
-# n_cells_filtered <- ncol(seurat_obj_filtered) 
-# 
-# # Plot QC metrics in violin plots after filtering
-# plot_qc(seurat_obj = seurat_obj_filtered, 
-#         sample_name = sample_name, 
-#         n_cells = n_cells_filtered, 
-#         version = "filtered", 
-#         filtering = rlang::expr_text(filtering_expr))
+# Extra plots 
+FeatureScatter(seurat_obj, feature1 = "nCount_RNA", feature2 = "percent.mt")
+FeatureScatter(seurat_obj, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
+# Filter cells based on QC plots
+filtering_expr <- expr(nFeature_RNA > 400 & nFeature_RNA < 4000 & percent.mt < 10)
+seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
+
+n_cells_filtered <- ncol(seurat_obj_filtered)
+
+# Plot QC metrics in violin plots after filtering
+plot_qc(seurat_obj = seurat_obj_filtered, 
+        sample_name = sample_name, 
+        n_cells = n_cells_filtered, 
+        version = "filtered", 
+        filtering = rlang::expr_text(filtering_expr))
 
 # Save filtered seurat object
-seurat_obj_roughQC_list[[sample_name]] <- seurat_obj
+seurat_obj_QC_filtered_list[[sample_name]] <- seurat_obj_filtered
 
 # Clean up
-rm(seurat_obj, n_cells_raw)
-
+rm(seurat_obj, seurat_obj_filtered, n_cells_raw, n_cells_filtered)
 
 ########################################## Export list of filtered Seurat objects ##########################################
 
-names(seurat_obj_roughQC_list)
+names(seurat_obj_QC_filtered_list)
 
-saveRDS(seurat_obj_roughQC_list, "02_roughQC/out/seurat_obj_roughQC_list.rds")
+saveRDS(seurat_obj_QC_filtered_list, "03_QC_filtering/out/seurat_obj_QC_filtered_list.rds")
