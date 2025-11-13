@@ -8,6 +8,11 @@ wget -P ../ -O ../GSM7789315.barcodes.tsv.gz "https://www.ncbi.nlm.nih.gov/geo/d
 wget -P ../ -O ../GSM7789315.features.tsv.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789315&format=file&file=GSM7789315%5FMUC29369%5Ffeatures%2Etsv%2Egz"
 wget -P ../ -O ../GSM7789315.matrix.mtx.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789315&format=file&file=GSM7789315%5FMUC29369%5Fmatrix%2Emtx%2Egz"
 
+# Sample: GSM7789317 control mLN steady state
+wget -P ../ -O ../GSM7789317.barcodes.tsv.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789317&format=file&file=GSM7789317%5FMUC29371%5Fbarcodes%2Etsv%2Egz"
+wget -P ../ -O ../GSM7789317.features.tsv.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789317&format=file&file=GSM7789317%5FMUC29371%5Ffeatures%2Etsv%2Egz"
+wget -P ../ -O ../GSM7789317.matrix.mtx.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM7789317&format=file&file=GSM7789317%5FMUC29371%5Fmatrix%2Emtx%2Egz"
+
 ############################################ Data set 2. Vuk Cerovic ############################################
 # GEO study link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE283808
 
@@ -102,11 +107,12 @@ wget -P ../ -O ../GSM5678427_LP_raw_gene_bc_matrices_h5.h5 "https://www.ncbi.nlm
 
 ############################################ Data set 7. ############################################
 # https://www.ebi.ac.uk/biostudies/ArrayExpress/studies/E-MTAB-9522?query=E-MTAB-9522
-wget -P ../ -O ../E_MTAB_9522_wt_S1_R1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R1.fastq.gz
-wget -P ../ -O ../E_MTAB_9522_wt_S1_R2.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R2.fastq.gz
-wget -P ../ -O ../E_MTAB_9522_wt_S1_I1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_I1.fastq.gz
+# wget -P ../ -O ../E_MTAB_9522_wt_S1_R1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R1.fastq.gz
+# wget -P ../ -O ../E_MTAB_9522_wt_S1_R2.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R2.fastq.gz
+# wget -P ../ -O ../E_MTAB_9522_wt_S1_I1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_I1.fastq.gz
 
-
+# preprocessed in computerome 
+rsync -avzP helweg@transfer.computerome.dk:/home/people/helweg/ciir/people/helweg/LPcDC_cellranger/cellranger_analysis_7/outputs/wt/outs/filtered_feature_bc_matrix ../E_MTAB_9522
 
 
 

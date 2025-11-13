@@ -16,7 +16,7 @@ data_files
 ############################################ Data set 4. George Kollias ############################################
 
 # GSE255350_myeloid_raw_counts.txt.gz
-
+GSE255350
 sample_name <- "GSE255350"
 
 # Read data
