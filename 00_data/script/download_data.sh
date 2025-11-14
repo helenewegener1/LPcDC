@@ -107,6 +107,7 @@ wget -P ../ -O ../GSM5678427_LP_raw_gene_bc_matrices_h5.h5 "https://www.ncbi.nlm
 
 ############################################ Data set 7. ############################################
 # https://www.ebi.ac.uk/biostudies/ArrayExpress/studies/E-MTAB-9522?query=E-MTAB-9522
+# Sample name: E_MTAB_9522
 # wget -P ../ -O ../E_MTAB_9522_wt_S1_R1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R1.fastq.gz
 # wget -P ../ -O ../E_MTAB_9522_wt_S1_R2.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_R2.fastq.gz
 # wget -P ../ -O ../E_MTAB_9522_wt_S1_I1.fastq.gz https://ftp.ebi.ac.uk/biostudies/fire/E-MTAB-/522/E-MTAB-9522/Files/wt_S1_I1.fastq.gz
