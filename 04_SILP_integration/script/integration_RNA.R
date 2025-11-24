@@ -168,7 +168,7 @@ for (red in reductions){
   
   for (res in res_list){
     
-    # res <- 0.3
+    # res <- 0.8
     
     seurat_integrated <- FindClusters(seurat_integrated, resolution = res, cluster.name = glue("{cluster.name}_res.{res}"))
     

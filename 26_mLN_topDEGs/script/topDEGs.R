@@ -29,15 +29,6 @@ ggsave(glue(glue("26_mLN_topDEGs/plot/UMAP_{cluster.name}.pdf")),
        width = 8, 
        height = 7)
 
-# Pre annotation 
-DimPlot(seurat_obj, reduction = reduction, group.by = "annotation", label = TRUE) +
-  labs(title = glue("UMAP - post integration"),
-       subtitle = "Annotation from study")
-
-ggsave(glue(glue("26_mLN_topDEGs/plot/UMAP_sample.pdf")), 
-       width = 8, 
-       height = 7)
-
 # Join layers 
 seurat_obj[["RNA"]] <- JoinLayers(seurat_obj[["RNA"]])
 Layers(seurat_obj[["RNA"]])

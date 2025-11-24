@@ -16,14 +16,19 @@ DefaultAssay(seurat_integrated) <- "RNA"
 
 Reductions(seurat_integrated)
 
-reduction <- "RNA_umap.harmony"
-cluster.name <- "RNA_harmony_clusters_res.0.7"
-# seurat_integrated$RNA_harmony_clusters_res.0.7
+# reduction <- "RNA_umap.harmony"
+# cluster.name <- "RNA_harmony_clusters_res.0.7"
+
+reduction <- "RNA_umap.cca"
+cluster.name <- "RNA_cca_clusters_res.0.8"
+# seurat_integrated$RNA_cca_clusters_res.0.8
 
 # Final UMAP
 DimPlot(seurat_integrated, reduction = reduction, group.by = cluster.name, label = TRUE) +
   labs(title = glue("UMAP - post integration"),
        subtitle = cluster.name)
+
+# FeaturePlot(seurat_integrated, features = "Prdm16", reduction = reduction)
 
 ggsave(glue(glue("06_SILP_topDEGs/plot/UMAP_{cluster.name}.pdf")), 
        width = 8, 
@@ -59,7 +64,7 @@ top_markers_list <- df_all_markers %>%
   split(., .$cluster)
 
 # Export xlsx file 
-out_file <- "06_SILP_topDEGs/out/SILP_Top_100_Cluster_DE_Markers.xlsx"
+out_file <- glue("06_SILP_topDEGs/out/SILP_Top_100_Cluster_DE_Markers_{cluster.name}.xlsx")
 
 # Use openxlsx::write.xlsx, which takes the named list and writes
 # each element as a separate sheet (sheet name = list name, i.e., Cluster ID)
