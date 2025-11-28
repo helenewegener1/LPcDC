@@ -55,3 +55,17 @@ explore_annotation_plot <- function(seurat_obj, dimplot, marker_genes, descripti
   
 }
 
+# Basic function to convert human to mouse gene names
+# https://www.r-bloggers.com/2016/10/converting-mouse-to-human-gene-names-with-biomart-package/
+convertHumanGeneList <- function(x){
+  
+  # https://github.com/Huber-group-EMBL/biomaRt/issues/61
+  human <- useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = "https://dec2021.archive.ensembl.org/")
+  mouse <- useMart("ensembl", dataset = "mmusculus_gene_ensembl", host = "https://dec2021.archive.ensembl.org/")
+  genesV2 <- getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = x , mart = human, attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
+  humanx <- unique(genesV2[, 2])
+  # Print the first 6 genes found to the screen
+  # print(head(humanx))
+  return(humanx)
+}
+

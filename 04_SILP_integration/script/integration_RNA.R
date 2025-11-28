@@ -34,9 +34,9 @@ seurat_merged <- ScaleData(seurat_merged)
 seurat_merged <- RunPCA(seurat_merged)
 
 ElbowPlot(seurat_merged)
-seurat_merged <- FindNeighbors(seurat_merged,  dims = 1:30)
+seurat_merged <- FindNeighbors(seurat_merged,  dims = 1:20)
 seurat_merged <- FindClusters(seurat_merged, resolution = 0.4)
-seurat_merged <- RunUMAP(seurat_merged, reduction = "pca", dims = 1:30)
+seurat_merged <- RunUMAP(seurat_merged, reduction = "pca", dims = 1:20)
 
 # Save merged object
 # saveRDS(seurat_merged, "04_integration/out/seurat_merged_SCT.rds")
@@ -91,24 +91,24 @@ seurat_integrated <- IntegrateLayers(
   verbose = FALSE
 )
 
-options(future.globals.maxSize = 8000 * 1024^2)  # 8 GB
-seurat_integrated <- IntegrateLayers(
-  object = seurat_integrated,
-  method = RPCAIntegration,
-  orig.reduction = "pca",
-  new.reduction = "RNA_integrated.rpca",
-  assay = "RNA",
-  verbose = FALSE
-)
-
-seurat_integrated <- IntegrateLayers(
-  object = seurat_integrated,
-  method = FastMNNIntegration,
-  orig.reduction = "pca",
-  new.reduction = "RNA_integrated.mnn",
-  assay = "RNA",
-  verbose = FALSE
-)
+# options(future.globals.maxSize = 8000 * 1024^2)  # 8 GB
+# seurat_integrated <- IntegrateLayers(
+#   object = seurat_integrated,
+#   method = RPCAIntegration,
+#   orig.reduction = "pca",
+#   new.reduction = "RNA_integrated.rpca",
+#   assay = "RNA",
+#   verbose = FALSE
+# )
+# 
+# seurat_integrated <- IntegrateLayers(
+#   object = seurat_integrated,
+#   method = FastMNNIntegration,
+#   orig.reduction = "pca",
+#   new.reduction = "RNA_integrated.mnn",
+#   assay = "RNA",
+#   verbose = FALSE
+# )
 
 ################### Export list of integrated Seurat objects ################### 
 
@@ -119,9 +119,9 @@ Reductions(seurat_integrated)
 reductions <- list(
   
   c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters"),
-  c("RNA_integrated.harmony", "RNA_umap.harmony", "RNA_harmony_clusters"),
-  c("RNA_integrated.mnn", "RNA_umap.mnn", "RNA_mnn_clusters"),
-  c("RNA_integrated.rpca", "RNA_umap.rpca", "RNA_rpca_clusters")
+  c("RNA_integrated.harmony", "RNA_umap.harmony", "RNA_harmony_clusters")
+  # c("RNA_integrated.mnn", "RNA_umap.mnn", "RNA_mnn_clusters"),
+  # c("RNA_integrated.rpca", "RNA_umap.rpca", "RNA_rpca_clusters")
   
 )
 
@@ -221,15 +221,15 @@ pdf(file = glue("04_SILP_integration/plot/{assay}/clustree_{cluster.name}.pdf"),
 clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
 dev.off()
 
-cluster.name <- "RNA_rpca_clusters"
-pdf(file = glue("04_SILP_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 12)
-clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
-dev.off()
-
-cluster.name <- "RNA_mnn_clusters"
-pdf(file = glue("04_SILP_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 12)
-clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
-dev.off()
+# cluster.name <- "RNA_rpca_clusters"
+# pdf(file = glue("04_SILP_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 12)
+# clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+# dev.off()
+# 
+# cluster.name <- "RNA_mnn_clusters"
+# pdf(file = glue("04_SILP_integration/plot/{assay}/clustree_{cluster.name}.pdf"), width = 12, height = 12)
+# clustree(seurat_integrated, assay = "RNA", return = "plot", prefix = glue("{cluster.name}_res."))
+# dev.off()
 
 ######################### Save as h5ad file for python ######################### 
 
