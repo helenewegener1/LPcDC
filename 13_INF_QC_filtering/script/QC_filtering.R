@@ -48,6 +48,8 @@ FeatureScatter(seurat_obj, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 filtering_expr <- expr(nFeature_RNA > 400 & nFeature_RNA < 6000 & percent.mt < 5)
 seurat_obj_filtered <- subset(seurat_obj, subset = !!filtering_expr)
 
+VlnPlot(seurat_integrated, features = "nFeature_RNA", layer = "counts", group.by = "annotation")
+
 n_cells_filtered <- ncol(seurat_obj_filtered)
 
 # Plot QC metrics in violin plots after filtering

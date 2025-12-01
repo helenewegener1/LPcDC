@@ -11,6 +11,8 @@ library(ggplot2)
 # Load data
 seurat_obj <- readRDS("24_mLN_seurat_workflow/out/mLN_seurat_obj_v5_RNA.rds")
 
+n_cell <- ncol(seurat_obj)
+
 # Settings
 DefaultAssay(seurat_obj) <- "RNA"
 
@@ -23,7 +25,9 @@ cluster.name <- "RNA_snn_res.1.2"
 # Final UMAP
 DimPlot(seurat_obj, reduction = reduction, group.by = cluster.name, label = TRUE) +
   labs(title = glue("UMAP - post integration"),
-       subtitle = cluster.name)
+       subtitle = cluster.name,
+       caption = glue("N cell: {n_cell}")
+       )
 
 ggsave(glue(glue("26_mLN_topDEGs/plot/UMAP_{cluster.name}.pdf")), 
        width = 8, 

@@ -67,7 +67,7 @@ for (feature in features){
       caption = glue("N cells: {n_cells}")
     )
   
-  ggsave(glue("05_SILP_annotation/plot/cell_cycle/UMAP_{feature}.pdf"), width = 8, height = 7)
+  ggsave(glue("05_SILP_annotation/plot/cell_cycle/UMAP_normal_{feature}.pdf"), width = 8, height = 7)
   
 }
 
@@ -78,17 +78,17 @@ DimPlot(seurat_integrated,
     title = "Cell cycle phase", 
     caption = glue("N cells: {n_cells}")
   )
-ggsave("05_SILP_annotation/plot/cell_cycle/UMAP_Phase.pdf", width = 8, height = 7)
+ggsave("05_SILP_annotation/plot/cell_cycle/UMAP_normal_Phase.pdf", width = 8, height = 7)
 
 DimPlot(seurat_integrated, reduction = umap_reduction.name, group.by = cluster.name, label = TRUE) +
   labs(title = glue("UMAP - {reduction}"),
        subtitle = glue("{cluster.name}_res.{res}"))
-ggsave("05_SILP_annotation/plot/cell_cycle/UMAP.pdf", width = 8, height = 7)
+ggsave("05_SILP_annotation/plot/cell_cycle/UMAP_normal.pdf", width = 8, height = 7)
 
 ######################## Regressing out cell cycle genes #######################
 
 seurat_obj <- seurat_integrated
-# rm(seurat_integrated)
+rm(seurat_integrated)
 
 n_dim <- 20
 res <- 1
@@ -104,8 +104,8 @@ seurat_obj <- NormalizeData(seurat_obj)
 seurat_obj <- FindVariableFeatures(seurat_obj)
 seurat_obj <- ScaleData(seurat_obj, vars.to.regress = c(m.s.genes, m.g2m.genes))
 # seurat_obj <- SCTransform(seurat_obj)
-ElbowPlot(seurat_obj)
 seurat_obj <- RunPCA(seurat_obj)
+ElbowPlot(seurat_obj)
 
 # # Get standard deviations of each PC
 # pca_sd <- seurat_obj[["pca"]]@stdev
@@ -154,7 +154,7 @@ features <- c("S.Score", "G2M.Score")
 for (feature in features){
   # feature <- "S.Score"
   FeaturePlot(seurat_integrated, 
-              reduction = umap_reduction.name,
+              reduction = umap_reduction,
               features = feature) + 
     labs(
       title = feature, 
@@ -166,7 +166,7 @@ for (feature in features){
 }
 
 DimPlot(seurat_integrated,
-        reduction = umap_reduction.name,
+        reduction = umap_reduction,
         group.by = "Phase") +
   labs(
     title = "Cell cycle phase",

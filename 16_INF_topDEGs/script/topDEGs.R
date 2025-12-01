@@ -11,6 +11,8 @@ library(ggplot2)
 # Load data
 seurat_integrated <- readRDS("14_INF_integration/out/INF_seurat_integrated_v5_RNA.rds")
 
+n_cell <- ncol(seurat_obj)
+
 # Settings
 DefaultAssay(seurat_integrated) <- "RNA"
 
@@ -23,7 +25,8 @@ cluster.name <- "RNA_harmony_clusters_res.0.7"
 # Final UMAP
 DimPlot(seurat_integrated, reduction = reduction, group.by = cluster.name, label = TRUE) +
   labs(title = glue("UMAP - post integration"),
-       subtitle = cluster.name)
+       subtitle = cluster.name,
+       caption = glue("N cell: {n_cell}"))
 
 ggsave(glue(glue("16_INF_topDEGs/plot/UMAP_{cluster.name}.pdf")), 
        width = 8, 
@@ -32,7 +35,8 @@ ggsave(glue(glue("16_INF_topDEGs/plot/UMAP_{cluster.name}.pdf")),
 # Pre annotation 
 DimPlot(seurat_integrated, reduction = reduction, group.by = "annotation", label = TRUE) +
   labs(title = glue("UMAP - post integration"),
-       subtitle = "Annotation from study")
+       subtitle = "Annotation from study",
+       caption = glue("N cell: {n_cell}"))
 
 ggsave(glue(glue("16_INF_topDEGs/plot/UMAP_sample.pdf")), 
        width = 8, 
@@ -82,13 +86,16 @@ openxlsx::write.xlsx(
 
 for (group in c("dare", "wt")){
   
-  # group <- "dare"
+  # group <- "wt"
   
   seurat_subset <- subset(seurat_integrated, subset = sample == glue("{group}-12w"))
   DefaultAssay(seurat_subset) <- "RNA"
   
+  n_cell <- ncol(seurat_subset)
+  
   DimPlot(seurat_subset, reduction = reduction, group.by = cluster.name, label = TRUE) + 
-    labs(subtitle = group)
+    labs(subtitle = group,
+         caption = glue("N cell: {n_cell}"))
   ggsave(glue(glue("16_INF_topDEGs/plot/UMAP_sample_{group}.pdf")), 
          width = 8, 
          height = 7)
