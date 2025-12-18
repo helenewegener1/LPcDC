@@ -127,7 +127,7 @@ reductions <- list(
 
 for (red in reductions){
   
-  # red <- c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters")
+  red <- c("RNA_integrated.cca", "RNA_umap.cca", "RNA_cca_clusters")
   
   reduction <- red[[1]]
   umap_reduction.name <- red[[2]]
@@ -168,7 +168,7 @@ for (red in reductions){
   
   for (res in res_list){
     
-    # res <- 0.8
+    res <- 1
     
     seurat_integrated <- FindClusters(seurat_integrated, resolution = res, cluster.name = glue("{cluster.name}_res.{res}"))
     

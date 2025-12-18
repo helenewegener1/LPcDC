@@ -6,3 +6,10 @@
 *.Rproj
 .DS_Store
 */.DS_Store
+
+00_data/STROMAL_GSM5819064.tar.gz
+00_data/STROMAL_GSM5819064/
+31_STROMAL_make_seurat/out
+32_STROMAL_QC/out
+34_STROMAL_integrate/out
+36_STROMAL_topDEGs/out

@@ -19,6 +19,31 @@ int_method <- "harmony"
 # Load data
 seurat_integrated <- readRDS(glue("04_SILP_integration/out/SILP_seurat_integrated_v5_{assay}.rds"))
 
+# Looking at integration methods
+Reductions(seurat_integrated)
+
+# # CCA
+# DimPlot(seurat_integrated, group.by = "RNA_cca_clusters_res.1.3", reduction = "RNA_umap.cca", label = TRUE) + NoLegend()
+# feature <- "Prdm16"
+# FeaturePlot(seurat_integrated, feature = feature, reduction = "RNA_umap.cca", pt.size = 2)
+# ggsave(glue("05_SILP_annotation/plot/Faidra/UMAP_cca_{feature}.pdf"), width = 8, height = 7)
+# 
+# # grep(rownames(seurat_integrated))
+# 
+# # Harmony
+# seurat_integrated$RNA_harmony_clusters_res.1.5
+# DimPlot(seurat_integrated, group.by = "RNA_harmony_clusters_res.1.5", reduction = "RNA_umap.harmony", label = TRUE) + NoLegend()
+# feature <- "Rorc"
+# FeaturePlot(seurat_integrated, feature = feature, reduction = "RNA_umap.harmony", pt.size = 2)
+# ggsave(glue("05_SILP_annotation/plot/Faidra/UMAP_harmony_{feature}.pdf"), width = 8, height = 7)
+# 
+# table(seurat_integrated$orig.ident)
+# 
+# rownames(seurat_integrated)
+
+# End
+seurat_integrated$RNA_cca_clusters_res.1
+
 DefaultAssay(seurat_integrated) <- assay
 
 # N cells 
@@ -199,6 +224,8 @@ seurat_obj[["RNA"]] <- subset(
   features = setdiff(rownames(seurat_obj), genes_to_remove)
 )
 
+genes_to_remove %in% rownames(seurat_obj[["RNA"]])
+
 # seurat_obj[["RNA"]] <- split(seurat_obj[["RNA"]], f = seurat_obj$orig.ident)
 # seurat_obj
 
@@ -225,6 +252,8 @@ seurat_integrated <- FindNeighbors(seurat_integrated, reduction = reduction, dim
 seurat_integrated <- FindClusters(seurat_integrated, reduction = reduction, resolution = res, cluster.name = cluster.name)
 seurat_integrated <- RunUMAP(seurat_integrated, reduction = reduction, dims = 1:n_dim, reduction.name = umap_reduction)
 
+genes_to_remove %in% rownames(seurat_integrated[["RNA"]])
+
 # Cluster plot
 # res <- 0.8
 DimPlot(seurat_integrated, reduction = umap_reduction, group.by = cluster.name, label = TRUE) +
@@ -235,11 +264,12 @@ ggsave("05_SILP_annotation/plot/cell_cycle/UMAP_removed.pdf", width = 8, height 
 
 saveRDS(seurat_integrated, "05_SILP_annotation/out/seurat_integrated_cell_cycle_genes_removed.rds")
 
+# seurat_integrated
 
-
-
-
-
+# FeaturePlot(seurat_integrated, features = "G2M.Score", reduction = umap_reduction)
+# DimPlot(seurat_integrated, group.by = "Phase", reduction = umap_reduction)
+# 
+# genes_to_remove %in% VariableFeatures(seurat_integrated) 
 
 
 

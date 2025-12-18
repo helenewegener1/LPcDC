@@ -115,5 +115,12 @@ wget -P ../ -O ../GSM5678427_LP_raw_gene_bc_matrices_h5.h5 "https://www.ncbi.nlm
 # preprocessed in computerome 
 rsync -avzP helweg@transfer.computerome.dk:/home/people/helweg/ciir/people/helweg/LPcDC_cellranger/cellranger_analysis_7/outputs/wt/outs/filtered_feature_bc_matrix ../E_MTAB_9522
 
+############################################ STROMAL ############################################
+# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM5819064
+# Sample name: GSM5819064
+wget -P ../ -O ../STROMAL_GSM5819064.tar.gz "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSM5819064&format=file&file=GSM5819064%5FRCM%5FmLN%5FWT%5FscRNAseq%2Etar%2Egz"
 
+# mkdir STROMAL_GSM5819064
+# tar -xzvf STROMAL_GSM5819064.tar.gz -C STROMAL_GSM5819064
 
+"https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE172514&format=file&file=GSE172514%5FSeuratObject%5FmLN%5Fday%5F0%5F10%5F24%5F56%5F300%5FnonENDO%5FSC%2ERds%2Egz"

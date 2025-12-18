@@ -13,6 +13,14 @@ source("03_SILP_QC_filtering/script/functions.R")
 # Load data
 seurat_obj_list <- readRDS("02_SILP_QC/out/SILP_seurat_obj_QC_metrics.rds")
 
+# c("Rorc", "Prdm16")
+VlnPlot(seurat_obj_list$GSM7789315, features = c("Rorc", "Prdm16"))
+VlnPlot(seurat_obj_list$GSM8672515, features = c("Rorc", "Prdm16"))
+VlnPlot(seurat_obj_list$GSM9122899, features = c("Rorc", "Prdm16", "scDblFinder.score"))
+VlnPlot(seurat_obj_list$GSE255350, features = c("Rorc", "Prdm16"))
+# VlnPlot(seurat_obj_list$GSM5678427, features = c("Rorc", "Prdm16"))
+VlnPlot(seurat_obj_list$E_MTAB_9522, features = c("Rorc", "Prdm16"))
+
 # Initialize filtered list
 seurat_obj_QC_filtered_list <- list()
 
