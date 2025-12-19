@@ -35,14 +35,25 @@ DimPlot(seurat_object, reduction = umap_reduction, group.by = cluster.name, labe
 ggsave(glue("07_SILP_subclustering/plot/UMAP_PRE_clean_round_2_{method}_res.{res}.pdf"), width = 8, height = 7)
 
 # Clusters to remove 
-target_cluster <- c(4, 28, 31, 37) # 17/12 Faidra meeting 
+target_cluster <- c("4", "28", "31", "37") # 17/12 Faidra meeting 
+
+# Check clusters
+cluster_table <- seurat_object[[cluster.name]] %>% pull() %>% table()
+cluster_table[target_cluster] %>% sum()
 
 # Create a new logical column
-seurat_object$keep_bool <- ifelse(seurat_object$RNA_cca_clusters_res.1 %in% target_cluster, FALSE, TRUE)
+seurat_object$keep_bool <- ifelse(pull(seurat_object[[cluster.name]]) %in% target_cluster, FALSE, TRUE)
 table(seurat_object$keep_bool)
 
 # Subset cluster
 seurat_object_clean <- subset(seurat_object, subset = keep_bool == TRUE)
+
+rm(seurat_object)
+
+# Confirm removal 
+DimPlot(seurat_object_clean, reduction = umap_reduction, group.by = cluster.name, label = TRUE, pt.size = 1.5) +
+  labs(title = glue("UMAP - {reduction}"),
+       subtitle = cluster.name)
 
 # Check layers (already split)
 # Layers(seurat_object_clean[["RNA"]])
@@ -59,7 +70,7 @@ ElbowPlot(seurat_object_clean)
 # Integrate
 # methods <- c("cca", "harmony")
 
-res <- 3
+# res <- 3
 n_dim <- 20
 method <- "cca"
 version <- 2
@@ -96,6 +107,7 @@ if (method == "cca"){
 for (res in c(2, 2.5, 3)){
   
   # res <- 3 #17/12 Faidra meeting 
+  # res <- 2.5
   
   cluster.name <- glue("RNA_{method}_clean_{version}_clusters_res.{res}") %>% as.character()
   

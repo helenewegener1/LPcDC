@@ -23,7 +23,11 @@ DimPlot(seurat_object, reduction = reduction, group.by = cluster.name, label = T
        subtitle = cluster.name)
 
 # Clusters to remove 
-target_cluster <- c(9, 24, 21, 22, 19) # CCA integration, res = 1, decided in meeting with Faidra
+target_cluster <- c("9", "24", "21", "22", "19") # CCA integration, res = 1, decided in meeting with Faidra
+
+# Check clusters
+cluster_table <- seurat_object[[cluster.name]] %>% pull() %>% table()
+cluster_table[target_cluster] %>% sum()
 
 # Create a new logical column
 seurat_object$keep_bool <- ifelse(seurat_object$RNA_cca_clusters_res.1 %in% target_cluster, FALSE, TRUE)
@@ -31,6 +35,10 @@ table(seurat_object$keep_bool)
 
 # Subset cluster
 seurat_object_clean <- subset(seurat_object, subset = keep_bool == TRUE)
+
+DimPlot(seurat_object_clean, reduction = reduction, group.by = cluster.name, label = TRUE) +
+  labs(title = glue("UMAP - post integration"),
+       subtitle = cluster.name)
 
 # Check layers (already split)
 # Layers(seurat_object_clean[["RNA"]])
@@ -45,7 +53,7 @@ seurat_object_clean <- RunPCA(seurat_object_clean)
 ElbowPlot(seurat_object_clean)
 
 # Integrate
-methods <- c("cca", "harmony")
+# methods <- c("cca", "harmony")
 
 # res <- 3
 n_dim <- 20
@@ -54,6 +62,7 @@ n_dim <- 20
 for (method in methods){
     
     # method <- "harmony"
+    method <- "cca"
     
     new.reduction <- glue("RNA_{method}_clean") %>% as.character()
     umap_reduction <- glue("RNA_umap.{method}_clean") %>% as.character()
@@ -84,7 +93,7 @@ for (method in methods){
     
     # Reductions(seurat_object_clean)
     
-    for (res in c(1, 1.1, 1.2, 1.3, 1.4, 1.5)){
+    for (res in c(2, 2.5, 3)){
       
       cluster.name <- glue("RNA_{method}_clean_clusters_res.{res}") %>% as.character()
       
@@ -124,8 +133,10 @@ saveRDS(seurat_object_clean, "07_SILP_subclustering/out/seurat_object_clean.rds"
 
 ##################################### DEGs #####################################
 
-res <- c(1, 1.1, 1.2, 1.3, 1.4, 1.5)
-method <- c("harmony", "cca")
+# res <- c(1, 1.1, 1.2, 1.3, 1.4, 1.5)
+res <- c(2, 2.5, 3)
+# method <- c("harmony", "cca")
+method <- c("cca")
 
 # Create all combinations
 combos <- expand.grid(method = method, res = res)
